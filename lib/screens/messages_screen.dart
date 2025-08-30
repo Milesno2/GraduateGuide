@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class MessagesScreen extends StatefulWidget {
@@ -10,365 +9,179 @@ class MessagesScreen extends StatefulWidget {
 }
 
 class _MessagesScreenState extends State<MessagesScreen> {
-  final TextEditingController _messageController = TextEditingController();
-  final List<ChatMessage> _messages = [
-    ChatMessage(
-      text: 'Hello! Welcome to Newly Graduate Hub. How can I help you today?',
-      isMe: false,
-      timestamp: DateTime.now().subtract(const Duration(minutes: 5)),
-      senderName: 'Career Advisor',
-      senderAvatar: 'pages assets/Messages.png',
-    ),
-    ChatMessage(
-      text: 'Hi! I\'m looking for guidance on building my resume.',
-      isMe: true,
-      timestamp: DateTime.now().subtract(const Duration(minutes: 4)),
-      senderName: 'You',
-      senderAvatar: 'pages assets/Me.png',
-    ),
-    ChatMessage(
-      text: 'Great! I can help you with that. What\'s your field of study?',
-      isMe: false,
-      timestamp: DateTime.now().subtract(const Duration(minutes: 3)),
-      senderName: 'Career Advisor',
-      senderAvatar: 'pages assets/Messages.png',
-    ),
-    ChatMessage(
-      text: 'I studied Computer Science and graduated last year.',
-      isMe: true,
-      timestamp: DateTime.now().subtract(const Duration(minutes: 2)),
-      senderName: 'You',
-      senderAvatar: 'pages assets/Me.png',
-    ),
-    ChatMessage(
-      text: 'Perfect! I\'ll send you some resume templates and tips specifically for CS graduates.',
-      isMe: false,
-      timestamp: DateTime.now().subtract(const Duration(minutes: 1)),
-      senderName: 'Career Advisor',
-      senderAvatar: 'pages assets/Messages.png',
-    ),
+  final TextEditingController _controller = TextEditingController();
+  final Color deepPurple = const Color(0xFF6C2786);
+
+  final List<Map<String, dynamic>> messages = [
+    {
+      'text':
+          "Hi I'm Seeking for job in your Organization, all the requirement for the job is available and i'm capable of handling thr role. sending this is to request for the link to apply for the post. thank you.",
+      'isMe': false,
+    },
+    {
+      'text':
+          "Hi I'm Seeking for job in your Organization, all the requirement for the job is available and i'm capable of handling thr role. sending this is to request for the link to apply for the post. thank you.",
+      'isMe': true,
+    },
   ];
-
-  @override
-  void dispose() {
-    _messageController.dispose();
-    super.dispose();
-  }
-
-  void _sendMessage() {
-    if (_messageController.text.trim().isNotEmpty) {
-      setState(() {
-        _messages.add(
-          ChatMessage(
-            text: _messageController.text.trim(),
-            isMe: true,
-            timestamp: DateTime.now(),
-            senderName: 'You',
-            senderAvatar: 'pages assets/Me.png',
-          ),
-        );
-      });
-      _messageController.clear();
-      
-      // Simulate response
-      Future.delayed(const Duration(seconds: 2), () {
-        if (mounted) {
-          setState(() {
-            _messages.add(
-              ChatMessage(
-                text: 'Thanks for your message! I\'ll get back to you soon with detailed guidance.',
-                isMe: false,
-                timestamp: DateTime.now(),
-                senderName: 'Career Advisor',
-                senderAvatar: 'pages assets/Messages.png',
-              ),
-            );
-          });
-        }
-      });
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade50,
+      resizeToAvoidBottomInset: true,
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Row(
-          children: [
-            CircleAvatar(
-              radius: 20,
-              backgroundColor: Colors.blue.shade100,
-              child: Image.asset(
-                'pages assets/Messages.png',
-                width: 30,
-                height: 30,
-                fit: BoxFit.cover,
-              ),
-            ),
-            const SizedBox(width: 12),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Career Advisor',
-                  style: GoogleFonts.poppins(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 16,
-                  ),
-                ),
-                Text(
-                  'Online',
-                  style: GoogleFonts.poppins(
-                    fontSize: 12,
-                    color: Colors.green.shade600,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: Image.asset('assets/pages_items/ChevronLeftOutline.png',
+              width: 24, height: 24),
           onPressed: () => Navigator.pop(context),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.call),
-            onPressed: () {
-              // TODO: Implement call functionality
-            },
+        centerTitle: true,
+        title: Text(
+          'Messages',
+          style: GoogleFonts.poppins(
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+            fontSize: 22,
           ),
-          IconButton(
-            icon: const Icon(Icons.more_vert),
-            onPressed: () {
-              // TODO: Show more options
-            },
+        ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 16),
+            child: Image.asset('assets/pages_items/Bell.png',
+                width: 26, height: 26),
           ),
         ],
       ),
       body: Column(
         children: [
-          // Header with speakerphone icon
-          Container(
-            padding: const EdgeInsets.all(16),
-            color: Colors.white,
-            child: Row(
-              children: [
-                Container(
-                  width: 50,
-                  height: 50,
-                  decoration: BoxDecoration(
-                    color: Colors.blue.shade100,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Image.asset(
-                    'pages assets/Speakerphone.png',
-                    width: 30,
-                    height: 30,
-                    fit: BoxFit.contain,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'AI Career Assistant',
-                        style: GoogleFonts.poppins(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 16,
-                        ),
-                      ),
-                      Text(
-                        'Get instant career guidance and support',
-                        style: GoogleFonts.poppins(
-                          fontSize: 12,
-                          color: Colors.grey.shade600,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ).animate().fadeIn(duration: 600.ms),
-
-          // Messages list
           Expanded(
             child: ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: _messages.length,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              itemCount: messages.length,
+              reverse: false,
               itemBuilder: (context, index) {
-                final message = _messages[index];
-                return _buildMessageBubble(message).animate().fadeIn(
-                  delay: Duration(milliseconds: index * 100),
-                );
+                final msg = messages[index];
+                return _buildChatBubble(msg['text'], msg['isMe']);
               },
             ),
           ),
-
-          // Message input
-          Container(
-            padding: const EdgeInsets.all(16),
-            color: Colors.white,
-            child: Row(
-              children: [
-                Expanded(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade100,
-                      borderRadius: BorderRadius.circular(25),
-                    ),
-                    child: TextField(
-                      controller: _messageController,
-                      decoration: InputDecoration(
-                        hintText: 'Type your message...',
-                        border: InputBorder.none,
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 12,
-                        ),
-                      ),
-                      maxLines: null,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.blue.shade600,
-                    shape: BoxShape.circle,
-                  ),
-                  child: IconButton(
-                    icon: const Icon(Icons.send, color: Colors.white),
-                    onPressed: _sendMessage,
-                  ),
-                ),
-              ],
-            ),
-          ).animate().slideY(begin: 0.3, end: 0),
+          _buildInputBar(),
         ],
       ),
     );
   }
 
-  Widget _buildMessageBubble(ChatMessage message) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
+  Widget _buildChatBubble(String text, bool isMe) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
-        mainAxisAlignment: message.isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment:
+            isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          if (!message.isMe) ...[
+          if (!isMe)
             CircleAvatar(
               radius: 16,
-              backgroundColor: Colors.blue.shade100,
-              child: Image.asset(
-                message.senderAvatar,
-                width: 20,
-                height: 20,
-                fit: BoxFit.cover,
-              ),
+              backgroundImage:
+                  AssetImage('assets/preloader_assets/charco_education.png'),
             ),
-            const SizedBox(width: 8),
-          ],
+          if (!isMe) const SizedBox(width: 6),
           Flexible(
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
-                color: message.isMe ? Colors.blue.shade600 : Colors.white,
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.1),
-                    spreadRadius: 1,
-                    blurRadius: 3,
-                    offset: const Offset(0, 1),
-                  ),
-                ],
+                color: isMe ? const Color(0xFFF8F6FF) : Colors.white,
+                border: Border.all(
+                  color: deepPurple.withOpacity(0.7),
+                  width: 2,
+                ),
+                borderRadius: BorderRadius.only(
+                  topLeft: const Radius.circular(16),
+                  topRight: const Radius.circular(16),
+                  bottomLeft: Radius.circular(isMe ? 16 : 0),
+                  bottomRight: Radius.circular(isMe ? 0 : 16),
+                ),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (!message.isMe)
-                    Text(
-                      message.senderName,
-                      style: GoogleFonts.poppins(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.grey.shade600,
-                      ),
-                    ),
-                  const SizedBox(height: 4),
-                  Text(
-                    message.text,
-                    style: GoogleFonts.poppins(
-                      fontSize: 14,
-                      color: message.isMe ? Colors.white : Colors.grey.shade800,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    _formatTime(message.timestamp),
-                    style: GoogleFonts.poppins(
-                      fontSize: 10,
-                      color: message.isMe ? Colors.white70 : Colors.grey.shade500,
-                    ),
-                  ),
-                ],
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              child: Text(
+                text,
+                style: GoogleFonts.poppins(
+                  fontSize: 14,
+                  color: Colors.black87,
+                ),
               ),
             ),
           ),
-          if (message.isMe) ...[
-            const SizedBox(width: 8),
+          if (isMe) const SizedBox(width: 6),
+          if (isMe)
             CircleAvatar(
               radius: 16,
-              backgroundColor: Colors.purple.shade100,
-              child: Image.asset(
-                message.senderAvatar,
-                width: 20,
-                height: 20,
-                fit: BoxFit.cover,
-              ),
+              backgroundImage:
+                  AssetImage('assets/preloader_assets/charco_education.png'),
             ),
-          ],
         ],
       ),
     );
   }
 
-  String _formatTime(DateTime timestamp) {
-    final now = DateTime.now();
-    final difference = now.difference(timestamp);
-    
-    if (difference.inMinutes < 1) {
-      return 'Just now';
-    } else if (difference.inMinutes < 60) {
-      return '${difference.inMinutes}m ago';
-    } else if (difference.inHours < 24) {
-      return '${difference.inHours}h ago';
-    } else {
-      return '${difference.inDays}d ago';
-    }
+  Widget _buildInputBar() {
+    return SafeArea(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        color: Colors.white,
+        child: Row(
+          children: [
+            GestureDetector(
+              onTap: () {
+                // Handle attach action
+              },
+              child: Image.asset('assets/pages_assets/attach.png',
+                  width: 24, height: 24),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: TextField(
+                controller: _controller,
+                decoration: InputDecoration(
+                  hintText: 'Type a message',
+                  hintStyle:
+                      GoogleFonts.poppins(color: Colors.grey, fontSize: 15),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.grey.shade300),
+                  ),
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  filled: true,
+                  fillColor: Colors.white,
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            GestureDetector(
+              onTap: () {
+                // Handle camera action
+              },
+              child: Image.asset('assets/pages_assets/camera.png',
+                  width: 24, height: 24),
+            ),
+            const SizedBox(width: 8),
+            GestureDetector(
+              onTap: () {
+                if (_controller.text.trim().isEmpty) return;
+                setState(() {
+                  messages.add({'text': _controller.text.trim(), 'isMe': true});
+                  _controller.clear();
+                });
+              },
+              child: Image.asset('assets/pages_assets/sender.png',
+                  width: 24, height: 24),
+            ),
+          ],
+        ),
+      ),
+    );
   }
-}
-
-class ChatMessage {
-  final String text;
-  final bool isMe;
-  final DateTime timestamp;
-  final String senderName;
-  final String senderAvatar;
-
-  ChatMessage({
-    required this.text,
-    required this.isMe,
-    required this.timestamp,
-    required this.senderName,
-    required this.senderAvatar,
-  });
 }

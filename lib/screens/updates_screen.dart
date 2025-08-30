@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class UpdatesScreen extends StatefulWidget {
@@ -10,287 +9,269 @@ class UpdatesScreen extends StatefulWidget {
 }
 
 class _UpdatesScreenState extends State<UpdatesScreen> {
-  final List<UpdateItem> _updates = [
-    UpdateItem(
-      title: 'New Course Available',
-      description: 'Advanced Web Development course is now live',
-      time: '2 hours ago',
-      type: UpdateType.course,
-      isRead: false,
-    ),
-    UpdateItem(
-      title: 'Job Opportunity',
-      description: 'Frontend Developer position at TechCorp',
-      time: '1 day ago',
-      type: UpdateType.job,
-      isRead: false,
-    ),
-    UpdateItem(
-      title: 'Skill Assessment',
-      description: 'Your JavaScript skills improved by 15%',
-      time: '2 days ago',
-      type: UpdateType.skill,
-      isRead: true,
-    ),
-    UpdateItem(
-      title: 'Resume Review',
-      description: 'Your resume has been reviewed by our experts',
-      time: '3 days ago',
-      type: UpdateType.resume,
-      isRead: true,
-    ),
-    UpdateItem(
-      title: 'Masters Program',
-      description: 'New postgraduate opportunities available',
-      time: '1 week ago',
-      type: UpdateType.masters,
-      isRead: true,
-    ),
+  final Color deepPurple = const Color(0xFF6C2786);
+
+  final List<Map<String, String>> updates = [
+    {
+      'title': 'Vacancy: Project Manager',
+      'company': 'Becon Grace Limited',
+      'location': 'Abuja, Onsite',
+      'experience': '3 years',
+      'mode':
+          'Send your cv to our email becongrace@gmail.com or send us a message via this App',
+      'active': 'true',
+    },
+    {
+      'title': 'Skill Aquisition: Web Development',
+      'company': 'Buggybillion',
+      'location': 'Ogbomoso, Oyo State, Onsite',
+      'requirement': 'A Good System and Strong Internet',
+      'how':
+          'Send us a message to us via this app to get the registration link.',
+      'active': 'true',
+    },
+    {
+      'title': 'Vacancy: Project Manager',
+      'company': 'Becon Grace Limited',
+      'location': 'Abuja, Onsite',
+      'experience': '3 years',
+      'mode':
+          'Send your cv to our email becongrace@gmail.com or send us a message via this App',
+      'active': 'true',
+    },
+    {
+      'title': 'Vacancy: Project Manager',
+      'company': 'Becon Grace Limited',
+      'location': 'Abuja, Onsite',
+      'experience': '3 years',
+      'mode':
+          'Send your cv to our email becongrace@gmail.com or send us a message via this App',
+      'active': 'true',
+    },
+    {
+      'title': 'Vacancy: Project Manager',
+      'company': 'Becon Grace Limited',
+      'location': 'Abuja, Onsite',
+      'experience': '3 years',
+      'mode':
+          'Send your cv to our email becongrace@gmail.com or send us a message via this App',
+      'active': 'false',
+    },
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade50,
-      appBar: AppBar(
-        title: Text(
-          'Updates',
-          style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
-        ),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.mark_email_read),
-            onPressed: () {
-              setState(() {
-                for (var update in _updates) {
-                  update.isRead = true;
-                }
-              });
-            },
+      backgroundColor: Colors.white,
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(60),
+        child: AppBar(
+          backgroundColor: Colors.white,
+          elevation: 0,
+          leading: IconButton(
+            icon: Image.asset('assets/pages_assets/ChevronLeftOutline.png',
+                width: 24, height: 24),
+            onPressed: () => Navigator.pop(context),
           ),
-        ],
-      ),
-      body: Column(
-        children: [
-          // Header with updates image
-          Container(
-            width: double.infinity,
-            height: 150,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.1),
-                  spreadRadius: 1,
-                  blurRadius: 5,
-                  offset: const Offset(0, 2),
-                ),
-              ],
+          centerTitle: true,
+          title: Text(
+            'Updates',
+            style: GoogleFonts.poppins(
+              color: Colors.black,
+              fontWeight: FontWeight.bold,
+              fontSize: 22,
             ),
-            child: Row(
+          ),
+          actions: [
+            Padding(
+              padding: const EdgeInsets.only(right: 16),
+              child: Image.asset('assets/pages_assets/Bell.png',
+                  width: 26, height: 26),
+            ),
+          ],
+        ),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Stay Updated',
-                          style: GoogleFonts.poppins(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.grey.shade800,
-                          ),
+                GestureDetector(
+                  onTap: () => Navigator.pushNamed(context, '/post'),
+                  child: Row(
+                    children: [
+                      Text(
+                        'Add post',
+                        style: GoogleFonts.poppins(
+                          color: deepPurple,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 15,
                         ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Get the latest updates on courses, jobs, and opportunities',
-                          style: GoogleFonts.poppins(
-                            fontSize: 14,
-                            color: Colors.grey.shade600,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                Container(
-                  width: 100,
-                  height: 100,
-                  margin: const EdgeInsets.all(20),
-                  child: Image.asset(
-                    'pages assets/updates.png',
-                    fit: BoxFit.contain,
+                      ),
+                      const SizedBox(width: 4),
+                      IconButton(
+                        icon: Image.asset('assets/pages_items/Speakerphone.png',
+                            width: 8, height: 8),
+                        onPressed: () =>
+                            Navigator.pushNamed(context, '/updates'),
+                      )
+                    ],
                   ),
                 ),
               ],
             ),
-          ).animate().fadeIn(duration: 600.ms),
-
-          Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: _updates.length,
-              itemBuilder: (context, index) {
-                final update = _updates[index];
-                return _buildUpdateCard(update).animate().fadeIn(
-                  delay: Duration(milliseconds: index * 100),
-                );
-              },
+            const SizedBox(height: 8),
+            Expanded(
+              child: ListView.builder(
+                itemCount: updates.length,
+                itemBuilder: (context, index) {
+                  final item = updates[index];
+                  return _buildUpdateCard(item, deepPurple, context);
+                },
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
+      bottomNavigationBar: _buildBottomNavBar(context, deepPurple),
     );
   }
 
-  Widget _buildUpdateCard(UpdateItem update) {
+  Widget _buildUpdateCard(
+      Map<String, String> item, Color deepPurple, BuildContext context) {
+    final bool isActive = item['active'] == 'true';
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 1,
-            blurRadius: 5,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        border: Border.all(
+          color: isActive ? deepPurple : Colors.grey.shade300,
+          width: 2,
+        ),
+        borderRadius: BorderRadius.circular(16),
       ),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: 50,
-            height: 50,
-            decoration: BoxDecoration(
-              color: _getUpdateColor(update.type).withOpacity(0.1),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(
-              _getUpdateIcon(update.type),
-              color: _getUpdateColor(update.type),
-              size: 24,
+          Text(
+            item['title'] ?? '',
+            style: GoogleFonts.poppins(
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+              color: isActive ? deepPurple : Colors.grey,
             ),
           ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        update.title,
-                        style: GoogleFonts.poppins(
-                          fontSize: 16,
-                          fontWeight: update.isRead ? FontWeight.w500 : FontWeight.w600,
-                          color: update.isRead ? Colors.grey.shade700 : Colors.grey.shade800,
-                        ),
-                      ),
-                    ),
-                    if (!update.isRead)
-                      Container(
-                        width: 8,
-                        height: 8,
-                        decoration: BoxDecoration(
-                          color: Colors.blue.shade600,
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  update.description,
-                  style: GoogleFonts.poppins(
-                    fontSize: 14,
-                    color: Colors.grey.shade600,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  update.time,
-                  style: GoogleFonts.poppins(
-                    fontSize: 12,
-                    color: Colors.grey.shade500,
-                  ),
-                ),
-              ],
+          if (item.containsKey('company'))
+            Text(
+              'Company: ${item['company']}',
+              style: GoogleFonts.poppins(fontSize: 13, color: Colors.grey[800]),
             ),
-          ),
-          Icon(
-            Icons.arrow_forward_ios,
-            color: Colors.grey.shade400,
-            size: 16,
+          if (item.containsKey('location'))
+            Text(
+              'Location: ${item['location']}',
+              style: GoogleFonts.poppins(fontSize: 13, color: Colors.grey[800]),
+            ),
+          if (item.containsKey('experience'))
+            Text(
+              'Experience: ${item['experience']}',
+              style: GoogleFonts.poppins(fontSize: 13, color: Colors.grey[800]),
+            ),
+          if (item.containsKey('requirement'))
+            Text(
+              'Requirement: ${item['requirement']}',
+              style: GoogleFonts.poppins(fontSize: 13, color: Colors.grey[800]),
+            ),
+          if (item.containsKey('how'))
+            Text(
+              'How to Register: ${item['how']}',
+              style: GoogleFonts.poppins(fontSize: 13, color: Colors.grey[800]),
+            ),
+          if (item.containsKey('mode'))
+            Text(
+              'Mode of Application: ${item['mode']}',
+              style: GoogleFonts.poppins(fontSize: 13, color: Colors.grey[800]),
+            ),
+          const SizedBox(height: 10),
+          Align(
+            alignment: Alignment.centerRight,
+            child: ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: isActive ? deepPurple : Colors.grey.shade300,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
+                elevation: 0,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+              ),
+              onPressed: () {
+                Navigator.pushNamed(context, '/messages_screen');
+              },
+              icon: const Icon(Icons.message, color: Colors.white, size: 18),
+              label: Text(
+                'Message',
+                style: GoogleFonts.poppins(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14,
+                ),
+              ),
+            ),
           ),
         ],
       ),
     );
   }
 
-  Color _getUpdateColor(UpdateType type) {
-    switch (type) {
-      case UpdateType.course:
-        return Colors.blue;
-      case UpdateType.job:
-        return Colors.green;
-      case UpdateType.skill:
-        return Colors.orange;
-      case UpdateType.resume:
-        return Colors.purple;
-      case UpdateType.masters:
-        return Colors.teal;
-    }
+  Widget _buildBottomNavBar(BuildContext context, Color deepPurple) {
+    return Container(
+      decoration: BoxDecoration(color: Colors.white, boxShadow: [
+        BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, -2))
+      ]),
+      child: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
+        selectedItemColor: deepPurple,
+        unselectedItemColor: Colors.grey,
+        currentIndex: 2,
+        items: [
+          BottomNavigationBarItem(
+              icon: Image.asset('assets/pages_assets/Home (1).png',
+                  width: 22, height: 22),
+              label: 'Home'),
+          BottomNavigationBarItem(
+              icon: Image.asset('assets/pages_assets/Annotation.png',
+                  width: 22, height: 22),
+              label: 'Messages'),
+          BottomNavigationBarItem(
+              icon: Image.asset('assets/pages_assets/Speakerphone.png',
+                  width: 22, height: 22),
+              label: 'Updates'),
+          BottomNavigationBarItem(
+              icon: Image.asset('assets/pages_assets/UserCircle.png',
+                  width: 22, height: 22),
+              label: 'Me'),
+        ],
+        onTap: (index) {
+          switch (index) {
+            case 0:
+              Navigator.pushReplacementNamed(context, '/home');
+              break;
+            case 1:
+              Navigator.pushReplacementNamed(context, '/messages');
+              break;
+            case 2:
+              break;
+            case 3:
+              Navigator.pushReplacementNamed(context, '/me');
+              break;
+          }
+        },
+      ),
+    );
   }
-
-  IconData _getUpdateIcon(UpdateType type) {
-    switch (type) {
-      case UpdateType.course:
-        return Icons.school;
-      case UpdateType.job:
-        return Icons.work;
-      case UpdateType.skill:
-        return Icons.psychology;
-      case UpdateType.resume:
-        return Icons.description;
-      case UpdateType.masters:
-        return Icons.school;
-    }
-  }
-}
-
-class UpdateItem {
-  final String title;
-  final String description;
-  final String time;
-  final UpdateType type;
-  bool isRead;
-
-  UpdateItem({
-    required this.title,
-    required this.description,
-    required this.time,
-    required this.type,
-    required this.isRead,
-  });
-}
-
-enum UpdateType {
-  course,
-  job,
-  skill,
-  resume,
-  masters,
 }

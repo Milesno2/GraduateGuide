@@ -38,7 +38,34 @@ flutter:
     - assets/pages_items/nysc_logo.png
     - assets/pages_items/resume.png
     - assets/pages_items/task.png
+    - assets/pages_items/Bell.png
+    - assets/pages_items/support.png
+    - assets/pages_items/skill1.png
+    - assets/pages_items/skill2.png
+    - assets/pages_items/skill3.png
     - assets/pages_items/masters.png
     - assets/pages_items/job.png
     # Include the entire design assets folder (handles spaces/parentheses nicely)
-    - pages assets/
+    - assets/pages_assets/Annotation.png
+    - assets/pages_assets/Bell.png
+    - assets/pages_assets/Customer care (1).png
+    - assets/pages_assets/customer_care.png
+    - assets/pages_assets/Ellipse 1.png
+    - assets/pages_assets/Ellipse 2.png
+    - assets/pages_assets/Fresh Folk Teaching.png
+    - assets/pages_assets/Home (1).png
+    - assets/pages_assets/job.png
+    - assets/pages_assets/login (1).png
+    - assets/pages_assets/masters.png
+    - assets/pages_assets/Me.png
+    - assets/pages_assets/Messages.png
+    - assets/pages_assets/nysc_logo.png
+    - assets/pages_assets/register_gradient.png
+    - assets/pages_assets/register.png
+    - assets/pages_assets/resume.png
+    - assets/pages_assets/skill2.png
+    - assets/pages_assets/skill3.png
+    - assets/pages_assets/Skills.png
+    - assets/pages_assets/Speakerphone.png
+    - assets/pages_assets/UserCircle.png
+    - assets/pages_assets/updates.png

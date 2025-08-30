@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'screens/skill_screen.dart';
 import 'screens/preloader_screen_1.dart';
 import 'screens/preloader_screen_2.dart';
 import 'screens/preloader_screen_3.dart';
@@ -69,7 +70,7 @@ class NewlyGraduateHub extends StatelessWidget {
         '/messages': (context) => const MessagesScreen(),
         '/resume-builder': (context) => const ResumeBuilderScreen(),
         '/updates': (context) => const UpdatesScreen(),
-        '/skills': (context) => const SkillsScreen(),
+        '/skills': (context) => const SkillScreen(),
         '/jobs': (context) => const JobsScreen(),
         '/skill-progress': (context) => const SkillProgressScreen(),
         '/tasks': (context) => const TasksScreen(),
@@ -100,8 +101,14 @@ class SkillsScreen extends StatelessWidget {
         {'Dart in 100 minutes': 'https://www.youtube.com/watch?v=Ej_Pcr4uC2Q'},
       ],
       'Frontend (HTML/CSS/JS/React)': [
-        {'HTML & CSS Full Course': 'https://www.youtube.com/watch?v=G3e-cpL7ofc'},
-        {'JavaScript Full Course': 'https://www.youtube.com/watch?v=HdJ6f1A7A-8'},
+        {
+          'HTML & CSS Full Course':
+              'https://www.youtube.com/watch?v=G3e-cpL7ofc'
+        },
+        {
+          'JavaScript Full Course':
+              'https://www.youtube.com/watch?v=HdJ6f1A7A-8'
+        },
         {'React for Beginners': 'https://www.youtube.com/watch?v=SqcY0GlETPk'},
       ],
       'Backend (Node.js/Python)': [
@@ -109,10 +116,16 @@ class SkillsScreen extends StatelessWidget {
         {'Django for Beginners': 'https://www.youtube.com/watch?v=F5mRW0jo-U4'},
       ],
       'UI/UX (Figma)': [
-        {'Figma UI Design Tutorial': 'https://www.youtube.com/watch?v=jk1T0CdLxwU'},
+        {
+          'Figma UI Design Tutorial':
+              'https://www.youtube.com/watch?v=jk1T0CdLxwU'
+        },
       ],
       'Data (Python/SQL)': [
-        {'Python for Data Analysis': 'https://www.youtube.com/watch?v=_uQrJ0TkZlc'},
+        {
+          'Python for Data Analysis':
+              'https://www.youtube.com/watch?v=_uQrJ0TkZlc'
+        },
         {'SQL Tutorial': 'https://www.youtube.com/watch?v=HXV3zeQKqGY'},
       ],
     };
@@ -120,7 +133,8 @@ class SkillsScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
       appBar: AppBar(
-        title: Text('Acquire Skill', style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
+        title: Text('Acquire Skill',
+            style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
@@ -140,19 +154,30 @@ class SkillsScreen extends StatelessWidget {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(12),
-              boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 2))],
+              boxShadow: [
+                BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, 2))
+              ],
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(category, style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600, color: deepPurple)),
+                Text(category,
+                    style: GoogleFonts.poppins(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: deepPurple)),
                 const SizedBox(height: 8),
                 for (final m in links)
                   ListTile(
                     dense: true,
                     contentPadding: EdgeInsets.zero,
-                    leading: const Icon(Icons.play_circle_fill, color: Colors.redAccent),
-                    title: Text(m.keys.first, style: GoogleFonts.poppins(fontSize: 14)),
+                    leading: const Icon(Icons.play_circle_fill,
+                        color: Colors.redAccent),
+                    title: Text(m.keys.first,
+                        style: GoogleFonts.poppins(fontSize: 14)),
                     trailing: const Icon(Icons.open_in_new, size: 18),
                     onTap: () => _open(m.values.first),
                   ),
@@ -385,17 +410,22 @@ class PostScreen extends StatelessWidget {
     final Color deepPurple = const Color(0xFF6C2786);
     return Scaffold(
       appBar: AppBar(
-        title: Text('Add Post', style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
+        title: Text('Add Post',
+            style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => Navigator.pop(context)),
+        leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () => Navigator.pop(context)),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
             TextField(
-              decoration: InputDecoration(hintText: 'What do you want to share?', hintStyle: GoogleFonts.poppins()),
+              decoration: InputDecoration(
+                  hintText: 'What do you want to share?',
+                  hintStyle: GoogleFonts.poppins()),
               maxLines: 6,
             ),
             const SizedBox(height: 16),
@@ -404,7 +434,9 @@ class PostScreen extends StatelessWidget {
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(backgroundColor: deepPurple),
                 onPressed: () => Navigator.pop(context),
-                child: Text('Post', style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w600)),
+                child: Text('Post',
+                    style: GoogleFonts.poppins(
+                        color: Colors.white, fontWeight: FontWeight.w600)),
               ),
             ),
           ],
