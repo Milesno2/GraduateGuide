@@ -70,7 +70,7 @@ class NewlyGraduateHub extends StatelessWidget {
         '/messages': (context) => const MessagesScreen(),
         '/resume-builder': (context) => const ResumeBuilderScreen(),
         '/updates': (context) => const UpdatesScreen(),
-        '/skills': (context) => const SkillScreen(),
+        '/skills': (context) => const SkillsScreen(),
         '/jobs': (context) => const JobsScreen(),
         '/skill-progress': (context) => const SkillProgressScreen(),
         '/tasks': (context) => const TasksScreen(),
@@ -82,366 +82,421 @@ class NewlyGraduateHub extends StatelessWidget {
   }
 }
 
-// Skills screen with YouTube links
-class SkillsScreen extends StatelessWidget {
-  const SkillsScreen({super.key});
+class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
 
-  Future<void> _open(String url) async {
+  final Color deepPurple = const Color(0xFF6C2786);
+
+  Future<void> _openExternal(BuildContext context, String url) async {
     final uri = Uri.parse(url);
-    await launchUrl(uri, mode: LaunchMode.externalApplication);
+    final leave = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('Leave Graduate Guide?',
+            style: GoogleFonts.poppins(fontWeight: FontWeight.bold)),
+        content: Text(
+            'You are about to leave the Graduate Guide app and visit an external website. Continue?',
+            style: GoogleFonts.poppins()),
+        actions: [
+          TextButton(
+            child:
+                Text('Cancel', style: GoogleFonts.poppins(color: Colors.grey)),
+            onPressed: () => Navigator.pop(ctx, false),
+          ),
+          TextButton(
+            child:
+                Text('Continue', style: GoogleFonts.poppins(color: deepPurple)),
+            onPressed: () => Navigator.pop(ctx, true),
+          ),
+        ],
+      ),
+    );
+    if (leave == true) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
+  }
+
+  Widget _buildGridItem(String asset, String label) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Container(
+          width: 80,
+          height: 80,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.12),
+                blurRadius: 8,
+                spreadRadius: 1,
+              ),
+            ],
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: Image.asset(asset, fit: BoxFit.contain),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          label,
+          style: GoogleFonts.poppins(
+            fontSize: 13,
+            fontWeight: FontWeight.w500,
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildArrowItem() {
+    return Center(
+      child: Container(
+        width: 80,
+        height: 80,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.12),
+              blurRadius: 8,
+              spreadRadius: 1,
+            ),
+          ],
+        ),
+        child:
+            const Icon(Icons.arrow_forward_ios, size: 32, color: Colors.grey),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final Color deepPurple = const Color(0xFF6C2786);
-
-    final Map<String, List<Map<String, String>>> catalog = {
-      'Flutter & Dart': [
-        {'Flutter Crash Course': 'https://www.youtube.com/watch?v=VPvVD8t02U8'},
-        {'Dart in 100 minutes': 'https://www.youtube.com/watch?v=Ej_Pcr4uC2Q'},
-      ],
-      'Frontend (HTML/CSS/JS/React)': [
-        {
-          'HTML & CSS Full Course':
-              'https://www.youtube.com/watch?v=G3e-cpL7ofc'
-        },
-        {
-          'JavaScript Full Course':
-              'https://www.youtube.com/watch?v=HdJ6f1A7A-8'
-        },
-        {'React for Beginners': 'https://www.youtube.com/watch?v=SqcY0GlETPk'},
-      ],
-      'Backend (Node.js/Python)': [
-        {'Node.js API Tutorial': 'https://www.youtube.com/watch?v=Oe421EPjeBE'},
-        {'Django for Beginners': 'https://www.youtube.com/watch?v=F5mRW0jo-U4'},
-      ],
-      'UI/UX (Figma)': [
-        {
-          'Figma UI Design Tutorial':
-              'https://www.youtube.com/watch?v=jk1T0CdLxwU'
-        },
-      ],
-      'Data (Python/SQL)': [
-        {
-          'Python for Data Analysis':
-              'https://www.youtube.com/watch?v=_uQrJ0TkZlc'
-        },
-        {'SQL Tutorial': 'https://www.youtube.com/watch?v=HXV3zeQKqGY'},
-      ],
-    };
-
     return Scaffold(
-      backgroundColor: Colors.grey.shade50,
-      appBar: AppBar(
-        title: Text('Acquire Skill',
-            style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
+      backgroundColor: Colors.white,
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 24),
+              decoration: BoxDecoration(
+                color: deepPurple,
+                borderRadius: const BorderRadius.only(
+                  bottomLeft: Radius.circular(32),
+                  bottomRight: Radius.circular(32),
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 22,
+                        backgroundImage:
+                            AssetImage('assets/pages_items/profile.png'),
+                      ),
+                      const SizedBox(width: 12),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Welcome back',
+                              style: GoogleFonts.poppins(
+                                  color: Colors.white, fontSize: 13)),
+                          Text('DADA TIMILEHIN S.',
+                              style: GoogleFonts.poppins(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15)),
+                        ],
+                      ),
+                      const Spacer(),
+                      Icon(Icons.headset, color: Colors.white, size: 28),
+                      const SizedBox(width: 16),
+                      Icon(Icons.notifications_none,
+                          color: Colors.white, size: 28),
+                    ],
+                  ),
+                  const SizedBox(height: 32),
+                  Center(
+                    child: Text(
+                      'Graduate Guide',
+                      style: GoogleFonts.poppins(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 28,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 24),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: GridView.count(
+                crossAxisCount: 3,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                childAspectRatio: 0.95,
+                children: [
+                  GestureDetector(
+                    onTap: () => _openExternal(
+                        context, 'https://portal.nysc.org.ng/nysc1/'),
+                    child: _buildGridItem('assets/pages_items/nysc_logo.png',
+                        'Nysc Reg.\nGuidelines'),
+                  ),
+                  GestureDetector(
+                    onTap: () =>
+                        Navigator.pushNamed(context, '/resume-builder'),
+                    child: _buildGridItem(
+                        'assets/pages_items/resume.png', 'Resume Builder'),
+                  ),
+                  GestureDetector(
+                    onTap: () => Navigator.pushNamed(context, '/skills'),
+                    child: _buildGridItem(
+                        'assets/pages_items/task.png', 'Acquire Skill'),
+                  ),
+                  GestureDetector(
+                    onTap: () =>
+                        Navigator.pushNamed(context, '/masters-update'),
+                    child: _buildGridItem(
+                        'assets/pages_items/masters.png', 'Masters Update'),
+                  ),
+                  GestureDetector(
+                    onTap: () => Navigator.pushNamed(context, '/jobs'),
+                    child: _buildGridItem(
+                        'assets/pages_items/job.png', 'Job Offer'),
+                  ),
+                  _buildArrowItem(),
+                ],
+              ),
+            ),
+            const SizedBox(height: 32),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                children: [
+                  Text('Campus News',
+                      style: GoogleFonts.poppins(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                          color: deepPurple)),
+                  const Spacer(),
+                  TextButton(
+                    onPressed: () {},
+                    child: Text('See all >',
+                        style: GoogleFonts.poppins(color: deepPurple)),
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Card(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
+                child: ListTile(
+                  leading: Image.asset('assets/pages_items/fmn_logo.png',
+                      width: 48, height: 48, fit: BoxFit.contain),
+                  title: Text(
+                      'Lautech Student Emerge as the best in the FMN Competition',
+                      style: GoogleFonts.poppins(
+                          fontWeight: FontWeight.w500, fontSize: 14)),
+                  subtitle: Text('Posted 30 min ago',
+                      style: GoogleFonts.poppins(
+                          fontSize: 12, color: Colors.grey[600])),
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('NYSC Quick Links',
+                      style: GoogleFonts.poppins(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                          color: deepPurple)),
+                  const SizedBox(height: 12),
+                  ListTile(
+                    leading: Image.asset('assets/pages_items/nysc_logo.png',
+                        width: 36, height: 36),
+                    title: Text('NYSC Official Portal',
+                        style:
+                            GoogleFonts.poppins(fontWeight: FontWeight.w600)),
+                    subtitle: Text('Registration, guidelines, and updates.',
+                        style: GoogleFonts.poppins(fontSize: 13)),
+                    trailing:
+                        const Icon(Icons.open_in_new, color: Colors.green),
+                    onTap: () => _openExternal(
+                        context, 'https://portal.nysc.org.ng/nysc1/'),
+                  ),
+                  ListTile(
+                    leading:
+                        const Icon(Icons.info_outline, color: Colors.orange),
+                    title: Text('NYSC Requirements',
+                        style:
+                            GoogleFonts.poppins(fontWeight: FontWeight.w600)),
+                    subtitle: Text(
+                        'Eligibility, documents, and step-by-step process.',
+                        style: GoogleFonts.poppins(fontSize: 13)),
+                    trailing:
+                        const Icon(Icons.open_in_new, color: Colors.orange),
+                    onTap: () =>
+                        _openExternal(context, 'https://www.nysc.gov.ng/'),
+                  ),
+                  ListTile(
+                    leading: Icon(Icons.school, color: deepPurple),
+                    title: Text(
+                      'NYSC Orientation Camp Tips',
+                      style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+                    ),
+                    subtitle: Text(
+                      'Advice for a successful camp experience.',
+                      style: GoogleFonts.poppins(fontSize: 13),
+                    ),
+                    trailing: Icon(Icons.open_in_new, color: deepPurple),
+                    onTap: () => _openExternal(
+                      context,
+                      'https://www.nysc.gov.ng/orientation-camp.html',
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 32),
+          ],
         ),
       ),
-      body: ListView.builder(
-        padding: const EdgeInsets.all(16),
-        itemCount: catalog.length,
-        itemBuilder: (context, index) {
-          final String category = catalog.keys.elementAt(index);
-          final List<Map<String, String>> links = catalog[category]!;
-          return Container(
-            margin: const EdgeInsets.only(bottom: 12),
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 10,
-                    offset: const Offset(0, 2))
-              ],
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(category,
-                    style: GoogleFonts.poppins(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: deepPurple)),
-                const SizedBox(height: 8),
-                for (final m in links)
-                  ListTile(
-                    dense: true,
-                    contentPadding: EdgeInsets.zero,
-                    leading: const Icon(Icons.play_circle_fill,
-                        color: Colors.redAccent),
-                    title: Text(m.keys.first,
-                        style: GoogleFonts.poppins(fontSize: 14)),
-                    trailing: const Icon(Icons.open_in_new, size: 18),
-                    onTap: () => _open(m.values.first),
-                  ),
-              ],
-            ),
-          );
+      bottomNavigationBar: _buildBottomNavBar(context, deepPurple),
+    );
+  }
+
+  Widget _buildBottomNavBar(BuildContext context, Color deepPurple) {
+    return Container(
+      decoration: BoxDecoration(color: Colors.white, boxShadow: [
+        BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, -2))
+      ]),
+      child: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
+        selectedItemColor: deepPurple,
+        unselectedItemColor: Colors.grey,
+        currentIndex: 0,
+        items: [
+          BottomNavigationBarItem(
+              icon: Image.asset('assets/pages_items/Home (1).png',
+                  width: 22, height: 22),
+              label: 'Home'),
+          BottomNavigationBarItem(
+              icon: Image.asset('assets/pages_items/Annotation.png',
+                  width: 22, height: 22),
+              label: 'Messages'),
+          BottomNavigationBarItem(
+              icon: Image.asset('assets/pages_items/Speakerphone.png',
+                  width: 22, height: 22),
+              label: 'Updates'),
+          BottomNavigationBarItem(
+              icon: Image.asset('assets/pages_items/UserCircle.png',
+                  width: 22, height: 22),
+              label: 'Me'),
+        ],
+        onTap: (index) {
+          switch (index) {
+            case 0:
+              break;
+            case 1:
+              Navigator.pushNamed(context, '/messages');
+              break;
+            case 2:
+              Navigator.pushNamed(context, '/updates');
+              break;
+            case 3:
+              Navigator.pushNamed(context, '/me');
+              break;
+          }
         },
       ),
+    );
+  }
+}
+
+class SkillsScreen extends StatelessWidget {
+  const SkillsScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Skills', style: GoogleFonts.poppins())),
+      body: Center(child: Text('Skills Screen', style: GoogleFonts.poppins())),
     );
   }
 }
 
 class JobsScreen extends StatelessWidget {
   const JobsScreen({super.key});
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade50,
-      appBar: AppBar(
-        title: Text(
-          'Jobs',
-          style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
-        ),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image.asset(
-              'assets/pages_items/job.png',
-              width: 200,
-              height: 200,
-              fit: BoxFit.contain,
-            ),
-            const SizedBox(height: 24),
-            Text(
-              'Job Opportunities',
-              style: GoogleFonts.poppins(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Colors.grey.shade800,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Coming Soon',
-              style: GoogleFonts.poppins(
-                fontSize: 16,
-                color: Colors.grey.shade600,
-              ),
-            ),
-          ],
-        ),
-      ),
+      appBar: AppBar(title: Text('Jobs', style: GoogleFonts.poppins())),
+      body: Center(child: Text('Jobs Screen', style: GoogleFonts.poppins())),
     );
   }
 }
 
 class SkillProgressScreen extends StatelessWidget {
   const SkillProgressScreen({super.key});
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade50,
-      appBar: AppBar(
-        title: Text(
-          'Skill Progress',
-          style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
-        ),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
+      appBar:
+          AppBar(title: Text('Skill Progress', style: GoogleFonts.poppins())),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image.asset(
-              'assets/pages_items/task.png',
-              width: 200,
-              height: 200,
-              fit: BoxFit.contain,
-            ),
-            const SizedBox(height: 24),
-            Text(
-              'Skill Progress',
-              style: GoogleFonts.poppins(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Colors.grey.shade800,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Coming Soon',
-              style: GoogleFonts.poppins(
-                fontSize: 16,
-                color: Colors.grey.shade600,
-              ),
-            ),
-          ],
-        ),
-      ),
+          child: Text('Skill Progress Screen', style: GoogleFonts.poppins())),
     );
   }
 }
 
 class TasksScreen extends StatelessWidget {
   const TasksScreen({super.key});
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade50,
-      appBar: AppBar(
-        title: Text(
-          'Tasks',
-          style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
-        ),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image.asset(
-              'assets/pages_items/task.png',
-              width: 200,
-              height: 200,
-              fit: BoxFit.contain,
-            ),
-            const SizedBox(height: 24),
-            Text(
-              'Task Management',
-              style: GoogleFonts.poppins(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Colors.grey.shade800,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Coming Soon',
-              style: GoogleFonts.poppins(
-                fontSize: 16,
-                color: Colors.grey.shade600,
-              ),
-            ),
-          ],
-        ),
-      ),
+      appBar: AppBar(title: Text('Tasks', style: GoogleFonts.poppins())),
+      body: Center(child: Text('Tasks Screen', style: GoogleFonts.poppins())),
     );
   }
 }
 
 class MastersUpdateScreen extends StatelessWidget {
   const MastersUpdateScreen({super.key});
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade50,
-      appBar: AppBar(
-        title: Text(
-          'Masters Update',
-          style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
-        ),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
+      appBar:
+          AppBar(title: Text('Masters Update', style: GoogleFonts.poppins())),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image.asset(
-              'assets/pages_items/masters.png',
-              width: 200,
-              height: 200,
-              fit: BoxFit.contain,
-            ),
-            const SizedBox(height: 24),
-            Text(
-              'Masters Programs',
-              style: GoogleFonts.poppins(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Colors.grey.shade800,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Coming Soon',
-              style: GoogleFonts.poppins(
-                fontSize: 16,
-                color: Colors.grey.shade600,
-              ),
-            ),
-          ],
-        ),
-      ),
+          child: Text('Masters Update Screen', style: GoogleFonts.poppins())),
     );
   }
 }
 
 class PostScreen extends StatelessWidget {
   const PostScreen({super.key});
-
   @override
   Widget build(BuildContext context) {
-    final Color deepPurple = const Color(0xFF6C2786);
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Add Post',
-            style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () => Navigator.pop(context)),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            TextField(
-              decoration: InputDecoration(
-                  hintText: 'What do you want to share?',
-                  hintStyle: GoogleFonts.poppins()),
-              maxLines: 6,
-            ),
-            const SizedBox(height: 16),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(backgroundColor: deepPurple),
-                onPressed: () => Navigator.pop(context),
-                child: Text('Post',
-                    style: GoogleFonts.poppins(
-                        color: Colors.white, fontWeight: FontWeight.w600)),
-              ),
-            ),
-          ],
-        ),
-      ),
+      appBar: AppBar(title: Text('Post', style: GoogleFonts.poppins())),
+      body: Center(child: Text('Post Screen', style: GoogleFonts.poppins())),
     );
   }
 }

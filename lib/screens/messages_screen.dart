@@ -11,7 +11,6 @@ class MessagesScreen extends StatefulWidget {
 class _MessagesScreenState extends State<MessagesScreen> {
   final TextEditingController _controller = TextEditingController();
   final Color deepPurple = const Color(0xFF6C2786);
-
   final List<Map<String, dynamic>> messages = [
     {
       'text':

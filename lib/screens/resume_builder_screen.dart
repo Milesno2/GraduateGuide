@@ -1,423 +1,194 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-class ResumeBuilderScreen extends StatefulWidget {
+class ResumeBuilderScreen extends StatelessWidget {
   const ResumeBuilderScreen({super.key});
 
-  @override
-  State<ResumeBuilderScreen> createState() => _ResumeBuilderScreenState();
-}
+  final Color deepPurple = const Color(0xFF6C2786);
 
-class _ResumeBuilderScreenState extends State<ResumeBuilderScreen> {
-  String _selectedTemplate = 'Modern';
-  String _selectedColor = 'Blue';
-  bool _isGenerating = false;
-
-  final List<String> _templates = [
-    'Modern',
-    'Professional',
-    'Creative',
-    'Minimal',
-    'Classic',
-  ];
-
-  final List<String> _colors = [
-    'Blue',
-    'Green',
-    'Purple',
-    'Orange',
-    'Red',
-  ];
+  Future<void> _openResumeSite(BuildContext context) async {
+    final uri = Uri.parse('https://www.canva.com/create/resumes/');
+    final leave = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('Leave Graduate Guide?',
+            style: GoogleFonts.poppins(fontWeight: FontWeight.bold)),
+        content: Text(
+            'You are about to leave the Graduate Guide app and visit a free resume builder website. Continue?',
+            style: GoogleFonts.poppins()),
+        actions: [
+          TextButton(
+            child:
+                Text('Cancel', style: GoogleFonts.poppins(color: Colors.grey)),
+            onPressed: () => Navigator.pop(ctx, false),
+          ),
+          TextButton(
+            child:
+                Text('Continue', style: GoogleFonts.poppins(color: deepPurple)),
+            onPressed: () => Navigator.pop(ctx, true),
+          ),
+        ],
+      ),
+    );
+    if (leave == true) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade50,
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text(
-          'Resume Builder',
-          style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
-        ),
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.pop(context),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.preview),
-            onPressed: () {
-              // TODO: Preview resume
-            },
+        centerTitle: true,
+        title: Text(
+          'Resume Builder',
+          style: GoogleFonts.poppins(
+            fontWeight: FontWeight.bold,
+            fontSize: 22,
+            color: Colors.black,
           ),
-          IconButton(
-            icon: const Icon(Icons.download),
-            onPressed: () {
-              // TODO: Download resume
-            },
-          ),
-        ],
+        ),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header with resume builder image
             Center(
               child: Container(
-                width: 200,
-                height: 200,
+                width: 140,
+                height: 140,
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.blue.withOpacity(0.2),
-                      blurRadius: 15,
-                      spreadRadius: 3,
-                    ),
-                  ],
+                  borderRadius: BorderRadius.circular(28),
+                  color: Colors.grey.shade100,
                 ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(20),
-                  child: Image.asset(
-                    'pages assets/Resume Buider (1).png',
-                    fit: BoxFit.cover,
-                  ),
+                child: Image.asset(
+                  'assets/pages_items/resume.png',
+                  fit: BoxFit.contain,
                 ),
               ),
-            ).animate().fadeIn(duration: 800.ms).scale(begin: const Offset(0.8, 0.8)),
-
+            ),
             const SizedBox(height: 24),
-
             Text(
-              'Create Professional Resume',
+              'Make your professional resume in minutes',
               style: GoogleFonts.poppins(
-                fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: Colors.grey.shade800,
+                fontSize: 24,
+                color: deepPurple,
               ),
-            ).animate().fadeIn(delay: 200.ms),
-
-            const SizedBox(height: 8),
-
-            Text(
-              'Choose a template and customize your resume to stand out to employers.',
-              style: GoogleFonts.poppins(
-                fontSize: 16,
-                color: Colors.grey.shade600,
-              ),
-            ).animate().fadeIn(delay: 400.ms),
-
-            const SizedBox(height: 32),
-
-            // Template selection
-            Text(
-              'Choose Template',
-              style: GoogleFonts.poppins(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: Colors.grey.shade800,
-              ),
-            ).animate().fadeIn(delay: 600.ms),
-
+            ),
             const SizedBox(height: 16),
-
-            SizedBox(
-              height: 120,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: _templates.length,
-                itemBuilder: (context, index) {
-                  final template = _templates[index];
-                  final isSelected = template == _selectedTemplate;
-                  
-                  return Container(
-                    width: 100,
-                    margin: const EdgeInsets.only(right: 12),
-                    child: GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          _selectedTemplate = template;
-                        });
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: isSelected ? Colors.blue.shade100 : Colors.white,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: isSelected ? Colors.blue.shade600 : Colors.grey.shade300,
-                            width: isSelected ? 2 : 1,
-                          ),
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              width: 40,
-                              height: 40,
-                              decoration: BoxDecoration(
-                                color: isSelected ? Colors.blue.shade600 : Colors.grey.shade200,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Image.asset(
-                                'pages assets/3dicons-file-text-dynamic-color.png',
-                                width: 24,
-                                height: 24,
-                                fit: BoxFit.contain,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              template,
-                              style: GoogleFonts.poppins(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                                color: isSelected ? Colors.blue.shade600 : Colors.grey.shade700,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  );
-                },
+            Text(
+              'From generating bullet points to automatic formatting, our resume builder will help you make a professional resume quickly and effortlessly.',
+              style: GoogleFonts.poppins(
+                fontSize: 15,
+                color: Colors.grey[800],
               ),
-            ).animate().fadeIn(delay: 800.ms),
-
+            ),
             const SizedBox(height: 24),
-
-            // Color selection
-            Text(
-              'Choose Color Theme',
-              style: GoogleFonts.poppins(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: Colors.grey.shade800,
-              ),
-            ).animate().fadeIn(delay: 1000.ms),
-
-            const SizedBox(height: 16),
-
-            Wrap(
-              spacing: 12,
-              runSpacing: 12,
-              children: _colors.map((color) {
-                final isSelected = color == _selectedColor;
-                final colorValue = _getColorValue(color);
-                
-                return GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _selectedColor = color;
-                    });
-                  },
-                  child: Container(
-                    width: 60,
-                    height: 60,
-                    decoration: BoxDecoration(
-                      color: colorValue,
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: isSelected ? Colors.grey.shade800 : Colors.transparent,
-                        width: isSelected ? 3 : 0,
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      _openResumeSite(context);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: deepPurple,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                    ),
+                    child: Text(
+                      'Build My Resume Now',
+                      style: GoogleFonts.poppins(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 15,
                       ),
                     ),
-                    child: isSelected
-                        ? const Icon(Icons.check, color: Colors.white, size: 24)
-                        : null,
-                  ),
-                );
-              }).toList(),
-            ).animate().fadeIn(delay: 1200.ms),
-
-            const SizedBox(height: 32),
-
-            // Resume sections
-            Text(
-              'Resume Sections',
-              style: GoogleFonts.poppins(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: Colors.grey.shade800,
-              ),
-            ).animate().fadeIn(delay: 1400.ms),
-
-            const SizedBox(height: 16),
-
-            _buildSectionCard(
-              'Personal Information',
-              Icons.person,
-              Colors.blue,
-              'Add your name, contact details, and summary',
-            ).animate().fadeIn(delay: 1600.ms),
-
-            _buildSectionCard(
-              'Education',
-              Icons.school,
-              Colors.green,
-              'Add your academic background and achievements',
-            ).animate().fadeIn(delay: 1800.ms),
-
-            _buildSectionCard(
-              'Experience',
-              Icons.work,
-              Colors.orange,
-              'Add your work experience and responsibilities',
-            ).animate().fadeIn(delay: 2000.ms),
-
-            _buildSectionCard(
-              'Skills',
-              Icons.psychology,
-              Colors.purple,
-              'Add your technical and soft skills',
-            ).animate().fadeIn(delay: 2200.ms),
-
-            _buildSectionCard(
-              'Projects',
-              Icons.folder,
-              Colors.red,
-              'Add your projects and achievements',
-            ).animate().fadeIn(delay: 2400.ms),
-
-            const SizedBox(height: 32),
-
-            // Generate button
-            SizedBox(
-              width: double.infinity,
-              height: 56,
-              child: ElevatedButton(
-                onPressed: _isGenerating ? null : _generateResume,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue.shade600,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                child: _isGenerating
-                    ? const SizedBox(
-                        width: 24,
-                        height: 24,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                        ),
-                      )
-                    : Text(
-                        'Generate Resume',
-                        style: GoogleFonts.poppins(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () {
+                      // TODO: Upload resume action
+                    },
+                    style: OutlinedButton.styleFrom(
+                      side: BorderSide(color: deepPurple, width: 1.5),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
                       ),
-              ),
-            ).animate().fadeIn(delay: 2600.ms),
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                    ),
+                    child: Text(
+                      'Upload My Existing Resume',
+                      style: GoogleFonts.poppins(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 15,
+                        color: deepPurple,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 32),
+            // Features
+            _featureTitle('Leverage the latest AI tech'),
+            _featureText(
+                'Our resume builder lets you make a fully customized resume in minutes. Use our software to your advantage & apply for jobs faster.'),
+            const SizedBox(height: 18),
+            _featureTitle('Generate bullet points'),
+            _featureText(
+                'Your resume’s experience section is what employers care about most. Use AI to autogenerate experience bullet points that prove your on-the-job skills.'),
+            const SizedBox(height: 18),
+            _featureTitle('Auto-format each section'),
+            _featureText(
+                'Formatting can be time-consuming. Don’t let margins & spacing slow you down – put in your details and the resume maker does the rest.'),
+            const SizedBox(height: 18),
+            _featureTitle('Instantly download your resume'),
+            _featureText(
+                'Easily download your resume as a PDF, for Word, or in text format. Use the dashboard to test different templates to see what works best for you.'),
+            const SizedBox(height: 18),
+            _featureTitle('Find industry-specific skills'),
+            _featureText(
+                'Enter your job title and our software uses AI to provide you with targeted skills suggestions.'),
+            const SizedBox(height: 18),
+            _featureTitle('Launch your job hunt'),
+            _featureText(
+                'Equipped with your perfected resume, you’re ready to take on the job market. Get more job interviews & earn better job offers.'),
+            const SizedBox(height: 32),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildSectionCard(String title, IconData icon, Color color, String description) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 1,
-            blurRadius: 5,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 50,
-            height: 50,
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(icon, color: color, size: 24),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: GoogleFonts.poppins(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.grey.shade800,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  description,
-                  style: GoogleFonts.poppins(
-                    fontSize: 12,
-                    color: Colors.grey.shade600,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Icon(
-            Icons.arrow_forward_ios,
-            color: Colors.grey.shade400,
-            size: 16,
-          ),
-        ],
-      ),
-    );
-  }
+  Widget _featureTitle(String title) => Text(
+        title,
+        style: GoogleFonts.poppins(
+          fontWeight: FontWeight.bold,
+          fontSize: 16,
+          color: Colors.black,
+        ),
+      );
 
-  Color _getColorValue(String colorName) {
-    switch (colorName) {
-      case 'Blue':
-        return Colors.blue.shade600;
-      case 'Green':
-        return Colors.green.shade600;
-      case 'Purple':
-        return Colors.purple.shade600;
-      case 'Orange':
-        return Colors.orange.shade600;
-      case 'Red':
-        return Colors.red.shade600;
-      default:
-        return Colors.blue.shade600;
-    }
-  }
-
-  void _generateResume() {
-    setState(() {
-      _isGenerating = true;
-    });
-
-    // Simulate resume generation
-    Future.delayed(const Duration(seconds: 3), () {
-      if (mounted) {
-        setState(() {
-          _isGenerating = false;
-        });
-        
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Resume generated successfully with ${_selectedTemplate} template and ${_selectedColor} theme!'),
-            backgroundColor: Colors.green,
-          ),
-        );
-      }
-    });
-  }
+  Widget _featureText(String text) => Text(
+        text,
+        style: GoogleFonts.poppins(
+          fontSize: 14,
+          color: Colors.grey[800],
+        ),
+      );
 }

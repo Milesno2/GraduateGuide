@@ -31,13 +31,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       image: 'assets/preloader_assets/happy_bunch_chat.png',
       description:
           'With Graduate guide you get to have available information on the available job offers.',
-      button: 'REGISTER',
+      button: 'NEXT',
     ),
     _OnboardingPageData(
       image: 'assets/preloader_assets/ola_playing_video_games.png',
       description:
           'With Graduate guide you get to have access to a guide o how to build a solid and standard resume.',
-      button: 'NEXT',
+      button: 'REGISTER',
     ),
   ];
 

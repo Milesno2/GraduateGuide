@@ -112,8 +112,10 @@ class _UpdatesScreenState extends State<UpdatesScreen> {
                       ),
                       const SizedBox(width: 4),
                       IconButton(
-                        icon: Image.asset('assets/pages_items/Speakerphone.png',
-                            width: 8, height: 8),
+                        icon: Image.asset(
+                            'assets/pages_assets/Speakerphone.png',
+                            width: 8,
+                            height: 8),
                         onPressed: () =>
                             Navigator.pushNamed(context, '/updates'),
                       )
