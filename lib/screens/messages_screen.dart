@@ -19,7 +19,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
     },
     {
       'text':
-          "Hi I'm Seeking for job in your Organization, all the requirement for the job is available and i'm capable of handling thr role. sending this is to request for the link to apply for the post. thank you.",
+          "Hi, we are currently on the look out for motion graphics designer, please send your cv if you are skiiled in, thank you.",
       'isMe': true,
     },
   ];
@@ -33,7 +33,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: Image.asset('assets/pages_items/ChevronLeftOutline.png',
+          icon: Image.asset('assets/pages_assets/ChevronLeftOutline.png',
               width: 24, height: 24),
           onPressed: () => Navigator.pop(context),
         ),
@@ -136,7 +136,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
               onTap: () {
                 // Handle attach action
               },
-              child: Image.asset('assets/pages_assets/attach.png',
+              child: Image.asset('assets/pages_assets/upload_files.png',
                   width: 24, height: 24),
             ),
             const SizedBox(width: 8),
@@ -163,7 +163,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
               onTap: () {
                 // Handle camera action
               },
-              child: Image.asset('assets/pages_assets/camera.png',
+              child: Image.asset('assets/pages_assets/Camera.png',
                   width: 24, height: 24),
             ),
             const SizedBox(width: 8),

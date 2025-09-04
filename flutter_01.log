@@ -1,0 +1,81 @@
+Flutter crash report.
+Please report a bug at https://github.com/flutter/flutter/issues.
+
+## command
+
+flutter run -d chrome
+
+## exception
+
+PathAccessException: PathAccessException: Deletion failed, path = 'build\cache.dill.track.dill' (OS Error: The process cannot access the file because it is being used by another process.
+, errno = 32)
+
+```
+#0      _Directory._deleteSync (dart:io/directory_impl.dart:226:7)
+#1      FileSystemEntity.deleteSync (dart:io/file_system_entity.dart:425:7)
+#2      _File._deleteSync (dart:io/file_impl.dart:364:50)
+#3      FileSystemEntity.deleteSync (dart:io/file_system_entity.dart:425:7)
+#4      ForwardingFileSystemEntity.deleteSync (package:file/src/forwarding/forwarding_file_system_entity.dart:70:16)
+#5      ForwardingFileSystemEntity.deleteSync (package:file/src/forwarding/forwarding_file_system_entity.dart:70:16)
+#6      ErrorHandlingFileSystem.deleteIfExists (package:flutter_tools/src/base/error_handling_io.dart:90:14)
+#7      ErrorHandlingFile.copySync.<anonymous closure> (package:flutter_tools/src/base/error_handling_io.dart:330:35)
+#8      _runSync (package:flutter_tools/src/base/error_handling_io.dart:550:14)
+#9      ErrorHandlingFile.copySync (package:flutter_tools/src/base/error_handling_io.dart:312:5)
+#10     ResidentRunner.cacheInitialDillCompilation (package:flutter_tools/src/resident_runner.dart:1294:18)
+#11     ResidentWebRunner.run.<anonymous closure> (package:flutter_tools/src/isolated/resident_web_runner.dart:336:11)
+<asynchronous suspension>
+#12     asyncGuard.<anonymous closure> (package:flutter_tools/src/base/async_guard.dart:109:26)
+<asynchronous suspension>
+```
+
+## flutter doctor
+
+```
+[32m[✓][39m Flutter (Channel stable, 3.29.0, on Microsoft Windows [Version 10.0.19045.6093], locale
+    en-US) [12.4s]
+    [32m•[39m Flutter version 3.29.0 on channel stable at C:\flutter
+    [32m•[39m Upstream repository https://github.com/flutter/flutter.git
+    [32m•[39m Framework revision 35c388afb5 (7 months ago), 2025-02-10 12:48:41 -0800
+    [32m•[39m Engine revision f73bfc4522
+    [32m•[39m Dart version 3.7.0
+    [32m•[39m DevTools version 2.42.2
+
+[32m[✓][39m Windows Version (10 Pro 64-bit, 22H2, 2009) [33.8s]
+
+[31m[✗][39m Android toolchain - develop for Android devices [8.2s]
+    [31m✗[39m Unable to locate Android SDK.
+      Install Android Studio from: https://developer.android.com/studio/index.html
+      On first launch it will assist you in installing the Android SDK components.
+      (or visit https://flutter.dev/to/windows-android-setup for detailed instructions).
+      If the Android SDK has been installed to a custom location, please use
+      `flutter config --android-sdk` to update to that location.
+
+
+[32m[✓][39m Chrome - develop for the web [8.0s]
+    [32m•[39m Chrome at C:\Program Files\Google\Chrome\Application\chrome.exe
+
+[33m[!][39m Visual Studio - develop Windows apps (Visual Studio Community 2022 17.8.5) [8.0s]
+    [32m•[39m Visual Studio at C:\Program Files\Microsoft Visual Studio\2022\Community
+    [32m•[39m Visual Studio Community 2022 version 17.8.34511.84
+    [32m•[39m Windows 10 SDK version 10.0.22621.0
+    [31m✗[39m The current Visual Studio installation is incomplete.
+      Please use Visual Studio Installer to complete the installation or reinstall Visual Studio.
+
+[33m[!][39m Android Studio (not installed) [31ms]
+    [32m•[39m Android Studio not found; download from https://developer.android.com/studio/index.html
+      (or visit https://flutter.dev/to/windows-android-setup for detailed instructions).
+
+[32m[✓][39m VS Code (version 1.100.3) [30ms]
+    [32m•[39m VS Code at C:\Users\DELL\AppData\Local\Programs\Microsoft VS Code
+    [32m•[39m Flutter extension version 3.116.0
+
+[32m[✓][39m Connected device (3 available) [241ms]
+    [32m•[39m Windows (desktop) • windows • windows-x64    • Microsoft Windows [Version 10.0.19045.6093]
+    [32m•[39m Chrome (web)      • chrome  • web-javascript • Google Chrome 139.0.7258.139
+    [32m•[39m Edge (web)        • edge    • web-javascript • Microsoft Edge 139.0.3405.86
+
+[32m[✓][39m Network resources [2.8s]
+    [32m•[39m All expected network resources are available.
+
+[33m![39m Doctor found issues in 3 categories.
+```

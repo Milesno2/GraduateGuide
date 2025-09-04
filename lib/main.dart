@@ -199,7 +199,7 @@ class HomeScreen extends StatelessWidget {
                       CircleAvatar(
                         radius: 22,
                         backgroundImage:
-                            AssetImage('assets/pages_items/profile.png'),
+                            AssetImage('assets/pages_assets/profile.png'),
                       ),
                       const SizedBox(width: 12),
                       Column(
@@ -216,10 +216,19 @@ class HomeScreen extends StatelessWidget {
                         ],
                       ),
                       const Spacer(),
-                      Icon(Icons.headset, color: Colors.white, size: 28),
+                      Image.asset(
+                        'assets/pages_assets/support.png',
+                        width: 28,
+                        height: 28,
+                        fit: BoxFit.contain,
+                      ),
                       const SizedBox(width: 16),
-                      Icon(Icons.notifications_none,
-                          color: Colors.white, size: 28),
+                      Image.asset(
+                        'assets/pages_items/Bell.png',
+                        width: 28,
+                        height: 28,
+                        fit: BoxFit.contain,
+                      ),
                     ],
                   ),
                   const SizedBox(height: 32),
@@ -395,19 +404,19 @@ class HomeScreen extends StatelessWidget {
         currentIndex: 0,
         items: [
           BottomNavigationBarItem(
-              icon: Image.asset('assets/pages_items/Home (1).png',
+              icon: Image.asset('assets/pages_assets/Home (1).png',
                   width: 22, height: 22),
               label: 'Home'),
           BottomNavigationBarItem(
-              icon: Image.asset('assets/pages_items/Annotation.png',
+              icon: Image.asset('assets/pages_assets/Annotation.png',
                   width: 22, height: 22),
               label: 'Messages'),
           BottomNavigationBarItem(
-              icon: Image.asset('assets/pages_items/Speakerphone.png',
+              icon: Image.asset('assets/pages_assets/Speakerphone.png',
                   width: 22, height: 22),
               label: 'Updates'),
           BottomNavigationBarItem(
-              icon: Image.asset('assets/pages_items/UserCircle.png',
+              icon: Image.asset('assets/pages_assets/UserCircle.png',
                   width: 22, height: 22),
               label: 'Me'),
         ],

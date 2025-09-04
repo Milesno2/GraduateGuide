@@ -45,7 +45,8 @@ class _LoginScreenState extends State<LoginScreen> {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Login failed. Check your email/password.', style: GoogleFonts.poppins(color: Colors.white)),
+          content: Text('Login failed. Check your email/password.',
+              style: GoogleFonts.poppins(color: Colors.white)),
           backgroundColor: Colors.red,
         ),
       );
@@ -98,7 +99,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   top: 32,
                   right: 32,
                   child: Image.asset(
-                    'assets/pages_items/register.png',
+                    'assets/pages_assets/Login.png',
                     width: 120,
                     height: 120,
                   ),
@@ -121,7 +122,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       controller: _emailController,
                       keyboardType: TextInputType.emailAddress,
                       validator: (v) {
-                        if (v == null || v.trim().isEmpty) return 'Email is required';
+                        if (v == null || v.trim().isEmpty) {
+                          return 'Email is required';
+                        }
                         final r = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
                         if (!r.hasMatch(v.trim())) return 'Enter a valid email';
                         return null;
@@ -129,19 +132,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       decoration: InputDecoration(
                         hintText: 'you@example.com',
                         hintStyle: GoogleFonts.poppins(fontSize: 15),
-                        contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 16),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
-                          borderSide: BorderSide(color: deepPurple),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: BorderSide(color: deepPurple),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: BorderSide(color: deepPurple, width: 2),
                         ),
                       ),
                     ),
@@ -153,27 +145,21 @@ class _LoginScreenState extends State<LoginScreen> {
                     TextFormField(
                       controller: _passwordController,
                       obscureText: _obscure,
-                      validator: (v) => (v == null || v.isEmpty) ? 'Password is required' : null,
+                      validator: (v) => (v == null || v.isEmpty)
+                          ? 'Password is required'
+                          : null,
                       decoration: InputDecoration(
                         hintText: '••••••••••••••••',
-                        hintStyle:
-                            GoogleFonts.poppins(fontSize: 15, color: Colors.grey),
-                        contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 16),
+                        hintStyle: GoogleFonts.poppins(
+                            fontSize: 15, color: Colors.grey),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
-                          borderSide: BorderSide(color: deepPurple),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: BorderSide(color: deepPurple),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: BorderSide(color: deepPurple, width: 2),
                         ),
                         suffixIcon: IconButton(
-                          icon: Icon(_obscure ? Icons.visibility_off : Icons.visibility),
+                          icon: Icon(
+                            _obscure ? Icons.visibility_off : Icons.visibility,
+                            color: Colors.grey,
+                          ),
                           onPressed: () => setState(() => _obscure = !_obscure),
                         ),
                       ),
@@ -195,7 +181,8 @@ class _LoginScreenState extends State<LoginScreen> {
                             ? const SizedBox(
                                 width: 22,
                                 height: 22,
-                                child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                                child: CircularProgressIndicator(
+                                    strokeWidth: 2, color: Colors.white),
                               )
                             : Text(
                                 'Login',
@@ -226,10 +213,12 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: 12),
                     Center(
                       child: TextButton(
-                        onPressed: () => Navigator.pushReplacementNamed(context, '/home'),
+                        onPressed: () =>
+                            Navigator.pushReplacementNamed(context, '/home'),
                         child: Text(
                           'Continue as Guest',
-                          style: GoogleFonts.poppins(color: deepPurple, fontWeight: FontWeight.w600),
+                          style: GoogleFonts.poppins(
+                              color: deepPurple, fontWeight: FontWeight.w600),
                         ),
                       ),
                     ),

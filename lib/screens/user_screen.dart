@@ -62,7 +62,6 @@ class _UserScreenState extends State<UserScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Replace these with actual user data from your database/model
     final userData = {
       'firstName': 'Dada',
       'lastName': 'Timilehin Silvanus',
@@ -95,8 +94,12 @@ class _UserScreenState extends State<UserScreen> {
                     top: 16,
                     left: 8,
                     child: IconButton(
-                      icon: const Icon(Icons.arrow_back,
-                          color: Colors.white, size: 28),
+                      icon: Image.asset(
+                        'assets/pages_assets/ChevronLeftOutline.png',
+                        width: 28,
+                        height: 28,
+                        color: Colors.white,
+                      ),
                       onPressed: () => Navigator.pop(context),
                     ),
                   ),
@@ -108,11 +111,15 @@ class _UserScreenState extends State<UserScreen> {
                         Image.asset('assets/pages_items/support.png',
                             width: 28, height: 28),
                         const SizedBox(width: 18),
-                        Image.asset(
-                          'assets/pages_assets/Bell.png',
-                          width: 27,
-                          height: 27,
-                          color: const Color.fromARGB(255, 250, 246, 246),
+                        GestureDetector(
+                          onTap: () =>
+                              Navigator.pushNamed(context, '/notifications'),
+                          child: Image.asset(
+                            'assets/pages_assets/Bell.png',
+                            width: 27,
+                            height: 27,
+                            color: Colors.white,
+                          ),
                         ),
                       ],
                     ),
@@ -131,13 +138,9 @@ class _UserScreenState extends State<UserScreen> {
                               backgroundColor: Colors.white,
                               backgroundImage: _avatarUrl != null
                                   ? NetworkImage(_avatarUrl!)
-                                  : null,
-                              child: _avatarUrl == null
-                                  ? Image.asset(
-                                      'assets/pages_assets/UserCircle.png',
-                                      width: 56,
-                                      height: 56)
-                                  : null,
+                                  : AssetImage('assets/pages_assets/avatar.png')
+                                      as ImageProvider,
+                              child: _avatarUrl == null ? null : null,
                             ),
                             InkWell(
                               onTap: _isUploading ? null : _changeAvatar,
@@ -153,8 +156,12 @@ class _UserScreenState extends State<UserScreen> {
                                         child: CircularProgressIndicator(
                                             strokeWidth: 2),
                                       )
-                                    : const Icon(Icons.camera_alt,
-                                        size: 18, color: Colors.black54),
+                                    : Image.asset(
+                                        'assets/pages_assets/Camera.png',
+                                        width: 18,
+                                        height: 18,
+                                        color: Colors.black54,
+                                      ),
                               ),
                             ),
                           ],
@@ -222,6 +229,48 @@ class _UserScreenState extends State<UserScreen> {
                             fontSize: 16,
                           ),
                         ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton.icon(
+                        icon: Icon(Icons.edit, color: Colors.white),
+                        label: Text(
+                          'Edit Profile',
+                          style: GoogleFonts.poppins(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: deepPurple,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          elevation: 0,
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                        ),
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (ctx) => AlertDialog(
+                              title: Text('Edit Profile',
+                                  style: GoogleFonts.poppins(
+                                      fontWeight: FontWeight.bold)),
+                              content: Text('Profile editing UI goes here.',
+                                  style: GoogleFonts.poppins()),
+                              actions: [
+                                TextButton(
+                                  child: Text('Close',
+                                      style: GoogleFonts.poppins()),
+                                  onPressed: () => Navigator.pop(ctx),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
                       ),
                     ),
                   ],
@@ -307,7 +356,7 @@ class _UserScreenState extends State<UserScreen> {
               Navigator.pushReplacementNamed(context, '/messages');
               break;
             case 2:
-              Navigator.pushReplacementNamed(context, '/updates');
+              Navigator.pushReplacementNamed(context, '/notifications');
               break;
             case 3:
               break;
@@ -318,7 +367,6 @@ class _UserScreenState extends State<UserScreen> {
   }
 }
 
-// Curved header clipper for the top section
 class CurvedHeaderClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {

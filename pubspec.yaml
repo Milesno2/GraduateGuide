@@ -37,8 +37,11 @@ flutter:
     - assets/pages_items/register_gradient.png
     - assets/pages_items/nysc_logo.png
     - assets/pages_items/resume.png
+    - assets/pages_items/fmn_logo.png
     - assets/pages_items/task.png
+    - assets/pages_assets/profile.png
     - assets/pages_items/Bell.png
+    - assets/pages_items/nigeria_flag.png
     - assets/pages_items/support.png
     - assets/pages_items/skill1.png
     - assets/pages_items/skill2.png
@@ -48,6 +51,12 @@ flutter:
     # Include the entire design assets folder (handles spaces/parentheses nicely)
     - assets/pages_assets/Annotation.png
     - assets/pages_assets/Bell.png
+    - assets/pages_assets/Login.png
+    - assets/pages_assets/sender.png
+    - assets/pages_assets/Camera.png
+    - assets/pages_assets/upload_files.png
+    - assets/pages_assets/ChevronLeftOutline.png
+
     - assets/pages_assets/Customer care (1).png
     - assets/pages_assets/customer_care.png
     - assets/pages_assets/Ellipse 1.png
@@ -65,6 +74,8 @@ flutter:
     - assets/pages_assets/resume.png
     - assets/pages_assets/skill2.png
     - assets/pages_assets/skill3.png
+    - assets/pages_assets/avatar.png
+    - assets/pages_assets/support.png
     - assets/pages_assets/Skills.png
     - assets/pages_assets/Speakerphone.png
     - assets/pages_assets/UserCircle.png
