@@ -14,8 +14,8 @@ if ! command -v flutter >/dev/null 2>&1; then
   if [ -d flutter-sdk ]; then
     echo "📦 Using cached Flutter SDK in flutter-sdk/"
   else
-    echo "📦 Installing Flutter (3.24.5)..."
-    git clone https://github.com/flutter/flutter.git -b 3.24.5 flutter-sdk
+    echo "📦 Installing Flutter (3.35.2)..."
+    git clone https://github.com/flutter/flutter.git -b 3.35.2 flutter-sdk
   fi
   export PATH="$PWD/flutter-sdk/bin:$PATH"
   flutter --version

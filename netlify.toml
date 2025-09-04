@@ -3,7 +3,7 @@
   publish = "build/web"
 
 [build.environment]
-  FLUTTER_VERSION = "3.24.5"
+  FLUTTER_VERSION = "3.35.2"
   NODE_VERSION = "18.19.0"
   SUPABASE_URL = "https://zqcykjxwsnlxmtzcmiga.supabase.co"
   SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpxY3lranh3c25seG10emNtaWdhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY4NDI4MDgsImV4cCI6MjA3MjQxODgwOH0.dkH258TCMv4q7XXLknfnLNCJu1LVqEGdzabsh-0Oj7s"
