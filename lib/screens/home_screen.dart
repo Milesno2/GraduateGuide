@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:newly_graduate_hub/screens/skills_screen.dart';
 import 'package:newly_graduate_hub/screens/messages_screen.dart';
 import 'package:newly_graduate_hub/screens/user_screen.dart';
-import 'package:newly_graduate_hub/screens/masters_screen.dart';
-import 'package:newly_graduate_hub/screens/jobs_screen.dart';
-import 'package:newly_graduate_hub/screens/career_assistant_screen.dart';
-import 'package:newly_graduate_hub/screens/nyscguidelines_screen.dart';
 import 'package:newly_graduate_hub/screens/notification_screen.dart';
 import 'package:newly_graduate_hub/screens/support_screen.dart';
+import 'package:newly_graduate_hub/screens/onboarding_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -53,125 +49,59 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildBody() {
     switch (_currentIndex) {
       case 0:
-        return _buildHomeContent();
+        return _buildHomeMinimal();
       case 1:
-        return const SupportScreen();
-      case 2:
         return const MessagesScreen();
+      case 2:
+        return const SupportScreen();
       case 3:
         return const UserScreen();
       default:
-        return _buildHomeContent();
+        return _buildHomeMinimal();
     }
   }
 
-  Widget _buildHomeContent() {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildPurposeLines(),
-          const SizedBox(height: 24),
-          _buildFeaturesGrid(),
-          const SizedBox(height: 24),
-          _buildQuickActions(),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildPurposeLines() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: const [
-        Text('Discover • Learn • Grow', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600)),
-        SizedBox(height: 6),
-        Text('Start your journey today', style: TextStyle(color: Colors.grey)),
-      ],
-    );
-  }
-
-  Widget _buildFeaturesGrid() {
-    return GridView.count(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      crossAxisCount: 2,
-      crossAxisSpacing: 16,
-      mainAxisSpacing: 16,
-      children: [
-        _buildFeatureCard(
-          'Skills Development',
-          Icons.school,
-          Colors.blue,
-          () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SkillsScreen())),
-        ),
-        _buildFeatureCard(
-          'Masters Programs',
-          Icons.school_outlined,
-          Colors.green,
-          () => Navigator.push(context, MaterialPageRoute(builder: (_) => const MastersScreen())),
-        ),
-        _buildFeatureCard(
-          'Job Opportunities',
-          Icons.work,
-          Colors.orange,
-          () => Navigator.push(context, MaterialPageRoute(builder: (_) => const JobsScreen())),
-        ),
-        _buildFeatureCard(
-          'Career Assistant',
-          Icons.psychology,
-          Colors.purple,
-          () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CareerAssistantScreen())),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildFeatureCard(String title, IconData icon, Color color, VoidCallback onTap) {
-    return Card(
-      elevation: 4,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
+  Widget _buildHomeMinimal() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 600),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Icon(icon, size: 48, color: color),
-              const SizedBox(height: 12),
-              Text(title, textAlign: TextAlign.center, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              const Text(
+                'Graduate Assistant Hub',
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.w700),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'Discover • Learn • Grow',
+                style: TextStyle(fontSize: 16, color: Colors.black54),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const OnboardingScreen()),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                  ),
+                  child: const Text('Start'),
+                ),
+              ),
             ],
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildQuickActions() {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('Quick Actions', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 16),
-            _buildActionTile('NYSC Guidelines', Icons.info, () => Navigator.push(context, MaterialPageRoute(builder: (_) => const NYSCGuidelinesScreen()))),
-            _buildActionTile('Profile Settings', Icons.person, () => setState(() => _currentIndex = 3)),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildActionTile(String title, IconData icon, VoidCallback onTap) {
-    return ListTile(
-      leading: Icon(icon, color: Colors.blue),
-      title: Text(title),
-      trailing: const Icon(Icons.arrow_forward_ios),
-      onTap: onTap,
     );
   }
 
@@ -184,8 +114,8 @@ class _HomeScreenState extends State<HomeScreen> {
       unselectedItemColor: Colors.grey,
       items: const [
         BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-        BottomNavigationBarItem(icon: Icon(Icons.support_agent), label: 'Support'),
         BottomNavigationBarItem(icon: Icon(Icons.message), label: 'Messages'),
+        BottomNavigationBarItem(icon: Icon(Icons.support_agent), label: 'Support'),
         BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
       ],
     );
