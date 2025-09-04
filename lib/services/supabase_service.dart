@@ -232,7 +232,7 @@ class SupabaseService {
           .from('notifications')
           .select('*')
           .eq('user_id', userId)
-          .is_('read_at', null);
+          .is('read_at', null);
 
       return response.length;
     } catch (e) {

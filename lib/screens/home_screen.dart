@@ -108,7 +108,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         _buildFeatureCard(
           'Masters Programs',
-          Icons.graduation_cap,
+          Icons.school_outlined,
           Colors.green,
           () => Navigator.push(
             context,
