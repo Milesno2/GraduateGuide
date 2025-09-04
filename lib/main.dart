@@ -108,7 +108,7 @@ class _NewlyGraduateHubState extends State<NewlyGraduateHub> {
             ),
           );
         } else {
-          child = const RootRouter();
+          child = const OnboardingScreen();
         }
 
         return MaterialApp(
