@@ -31,7 +31,7 @@ class _UserScreenState extends State<UserScreen> {
           : 'avatars/guest_${DateTime.now().millisecondsSinceEpoch}.png';
 
       final String? publicUrl = await SupabaseService()
-          .uploadAvatarBytes(data, path, contentType: 'image/png');
+          .uploadProfileImage(user.id, File.fromRawPath(data));
       if (!mounted) return;
       setState(() {
         _avatarUrl = publicUrl;
@@ -39,7 +39,7 @@ class _UserScreenState extends State<UserScreen> {
       });
 
       if (user != null && publicUrl != null) {
-        await SupabaseService().updateProfileImage(user.id, publicUrl);
+        await SupabaseService().updateUserProfile(user.id, {'profile_image': publicUrl});
       }
 
       ScaffoldMessenger.of(context).showSnackBar(

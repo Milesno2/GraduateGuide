@@ -275,7 +275,7 @@ class _NYSCGuidelinesScreenState extends State<NYSCGuidelinesScreen> {
             _buildInfoCard(
               title: 'Orientation Camp Guide',
               content: 'Tips and information for camp experience',
-              icon: Icons.camp,
+              icon: Icons.cabin,
               iconColor: Colors.green,
               onTap: () => _openExternal('https://www.nysc.gov.ng/orientation-camp.html'),
             ),

@@ -83,7 +83,7 @@ class NewlyGraduateHub extends StatelessWidget {
         '/messages': (context) => const MessagesScreen(),
         '/resume-builder': (context) => const ResumeBuilderScreen(),
         '/updates': (context) => const UpdatesScreen(),
-        '/skills': (context) => const SkillsScreen(),
+        '/skills': (context) => SkillsScreen(),
         '/jobs': (context) => const JobsScreen(),
         '/skill-progress': (context) => const SkillProgressScreen(),
         '/tasks': (context) => const TasksScreen(),
