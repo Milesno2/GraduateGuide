@@ -82,7 +82,7 @@ class SupabaseService {
       final response = await _supabase
           .from('conversations')
           .select('*, participants(*)')
-          .or('participant1_id.eq.$userId,participant2_id.eq.$userId')
+          .eq('participant1_id', userId)
           .order('updated_at', ascending: false);
 
       return List<Map<String, dynamic>>.from(response);
@@ -96,7 +96,7 @@ class SupabaseService {
     return _supabase
         .from('conversations')
         .stream(primaryKey: ['id'])
-        .or('participant1_id.eq.$userId,participant2_id.eq.$userId')
+        .eq('participant1_id', userId)
         .order('updated_at', ascending: false)
         .map((response) => List<Map<String, dynamic>>.from(response));
   }
@@ -232,7 +232,7 @@ class SupabaseService {
           .from('notifications')
           .select('*')
           .eq('user_id', userId)
-          .is_('read_at', null);
+          .is('read_at', null);
 
       return response.length;
     } catch (e) {
