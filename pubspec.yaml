@@ -15,12 +15,6 @@ dependencies:
   google_fonts: ^6.3.0
   image_picker: ^1.0.4
   url_launcher: ^6.2.1
-  # record: ^5.0.4  # Temporarily disabled for web build
-  # audioplayers: ^5.2.1  # Temporarily disabled for web build
-  # permission_handler: ^11.0.1  # Temporarily disabled for web build
-  # path_provider: ^2.1.1  # Temporarily disabled for web build
-  # shared_preferences: ^2.2.2  # Temporarily disabled for web build
-  # connectivity_plus: ^5.0.2  # Temporarily disabled for web build
   lottie: ^3.2.0
   flutter_animate: ^4.2.0
 
