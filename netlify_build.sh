@@ -27,13 +27,16 @@ fi
 echo "⚙️ Configuring Flutter for web..."
 flutter config --enable-web
 
-# Get dependencies
+# Clean and get dependencies
+echo "🧹 Cleaning previous builds..."
+flutter clean
+
 echo "📚 Getting Flutter dependencies..."
 flutter pub get
 
-# Clean previous builds
-echo "🧹 Cleaning previous builds..."
-flutter clean
+# Verify dependencies
+echo "🔍 Verifying dependencies..."
+flutter pub deps
 
 # Create .env file from Netlify environment variables
 echo "📝 Creating .env file from environment variables..."

@@ -2,6 +2,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'dart:io';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:flutter/foundation.dart';
 
 class SupabaseService {
   static String get supabaseUrl => dotenv.env['SUPABASE_URL'] ?? 'https://zqcykjxwsnlxmtzcmiga.supabase.co';
@@ -16,20 +17,30 @@ class SupabaseService {
   RealtimeChannel? _notificationsChannel;
 
   Future<void> initialize() async {
-    // Load environment variables
-    await dotenv.load(fileName: ".env");
-    
-    await Supabase.initialize(
-      url: supabaseUrl,
-      anonKey: supabaseAnonKey,
-    );
-    _supabase = Supabase.instance.client;
+    try {
+      // Load environment variables
+      await dotenv.load(fileName: ".env");
+      
+      await Supabase.initialize(
+        url: supabaseUrl,
+        anonKey: supabaseAnonKey,
+      );
+      _supabase = Supabase.instance.client;
+    } catch (e) {
+      print('Supabase initialization error: $e');
+      // Continue with fallback values
+    }
   }
 
   SupabaseClient get client => _supabase;
 
   User? getCurrentUser() {
-    return _supabase.auth.currentUser;
+    try {
+      return _supabase.auth.currentUser;
+    } catch (e) {
+      print('Get current user error: $e');
+      return null;
+    }
   }
 
   // ==================== AUTHENTICATION ====================
@@ -91,8 +102,12 @@ class SupabaseService {
   }
 
   Future<void> signOut() async {
-    await _disconnectRealtimeChannels();
-    await _supabase.auth.signOut();
+    try {
+      await _disconnectRealtimeChannels();
+      await _supabase.auth.signOut();
+    } catch (e) {
+      print('Sign out error: $e');
+    }
   }
 
   // ==================== USER PROFILE ====================
@@ -179,6 +194,12 @@ class SupabaseService {
   }
 
   Future<String?> uploadVoiceMessage(String conversationId, File audioFile) async {
+    // Skip voice upload on web for now
+    if (kIsWeb) {
+      print('Voice upload not supported on web yet');
+      return null;
+    }
+    
     try {
       final fileName = 'voice_${DateTime.now().millisecondsSinceEpoch}.m4a';
       final path = '$conversationId/$fileName';
@@ -199,30 +220,34 @@ class SupabaseService {
   // ==================== REAL-TIME MESSAGING ====================
 
   void initializeMessaging() {
-    _messagesChannel = _supabase.channel('messages')
-      .on(
-        RealtimeListenTypes.postgresChanges,
-        ChannelFilter(
-          event: 'INSERT',
-          schema: 'public',
-          table: 'messages',
-        ),
-        (payload, [ref]) {
-          _handleNewMessage(payload);
-        },
-      )
-      .on(
-        RealtimeListenTypes.postgresChanges,
-        ChannelFilter(
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'messages',
-        ),
-        (payload, [ref]) {
-          _handleMessageUpdate(payload);
-        },
-      )
-      .subscribe();
+    try {
+      _messagesChannel = _supabase.channel('messages')
+        .on(
+          RealtimeListenTypes.postgresChanges,
+          ChannelFilter(
+            event: 'INSERT',
+            schema: 'public',
+            table: 'messages',
+          ),
+          (payload, [ref]) {
+            _handleNewMessage(payload);
+          },
+        )
+        .on(
+          RealtimeListenTypes.postgresChanges,
+          ChannelFilter(
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'messages',
+          ),
+          (payload, [ref]) {
+            _handleMessageUpdate(payload);
+          },
+        )
+        .subscribe();
+    } catch (e) {
+      print('Initialize messaging error: $e');
+    }
   }
 
   void _handleNewMessage(Map<String, dynamic> payload) {
@@ -346,19 +371,23 @@ class SupabaseService {
   // ==================== NOTIFICATIONS ====================
 
   void initializeNotifications() {
-    _notificationsChannel = _supabase.channel('notifications')
-      .on(
-        RealtimeListenTypes.postgresChanges,
-        ChannelFilter(
-          event: 'INSERT',
-          schema: 'public',
-          table: 'notifications',
-        ),
-        (payload, [ref]) {
-          _handleNewNotification(payload);
-        },
-      )
-      .subscribe();
+    try {
+      _notificationsChannel = _supabase.channel('notifications')
+        .on(
+          RealtimeListenTypes.postgresChanges,
+          ChannelFilter(
+            event: 'INSERT',
+            schema: 'public',
+            table: 'notifications',
+          ),
+          (payload, [ref]) {
+            _handleNewNotification(payload);
+          },
+        )
+        .subscribe();
+    } catch (e) {
+      print('Initialize notifications error: $e');
+    }
   }
 
   void _handleNewNotification(Map<String, dynamic> payload) {
@@ -616,8 +645,12 @@ class SupabaseService {
   // ==================== UTILITY METHODS ====================
 
   void _disconnectRealtimeChannels() {
-    _messagesChannel?.unsubscribe();
-    _notificationsChannel?.unsubscribe();
+    try {
+      _messagesChannel?.unsubscribe();
+      _notificationsChannel?.unsubscribe();
+    } catch (e) {
+      print('Disconnect realtime channels error: $e');
+    }
   }
 
   Future<void> _initializeUserData(String userId) async {

@@ -100,4 +100,27 @@ class NewlyGraduateHub extends StatelessWidget {
 
 // HomeScreen class moved to home_screen.dart
 
-// Placeholder classes removed - proper screen files are used instead
+// Placeholder classes for routes that don't have dedicated files yet
+class TasksScreen extends StatelessWidget {
+  const TasksScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Tasks')),
+      body: const Center(child: Text('Tasks Screen - Coming Soon')),
+    );
+  }
+}
+
+class PostScreen extends StatelessWidget {
+  const PostScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Post')),
+      body: const Center(child: Text('Post Screen - Coming Soon')),
+    );
+  }
+}
