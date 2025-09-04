@@ -3,6 +3,7 @@ import 'package:newly_graduate_hub/services/supabase_service.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:typed_data';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:newly_graduate_hub/screens/edit_profile_screen.dart';
 
 class UserScreen extends StatefulWidget {
   const UserScreen({super.key});
@@ -61,11 +62,12 @@ class _UserScreenState extends State<UserScreen> {
                         SizedBox(
                           width: double.infinity,
                           child: ElevatedButton.icon(
-                            onPressed: () {
-                              // Navigate to edit profile (placeholder)
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Edit Profile coming soon')),
+                            onPressed: () async {
+                              final updated = await Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (_) => const EditProfileScreen()),
                               );
+                              if (updated == true && mounted) setState(() {});
                             },
                             icon: const Icon(Icons.edit),
                             label: Text('Edit Profile', style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
