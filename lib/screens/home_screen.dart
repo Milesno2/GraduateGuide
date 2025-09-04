@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -29,7 +30,6 @@ class HomeScreen extends StatelessWidget {
       ),
     );
     if (leave == true) {
-      // ignore: deprecated_member_use
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     }
   }

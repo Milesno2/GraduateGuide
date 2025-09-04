@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:newly_graduate_hub/services/supabase_service.dart';
-import 'package:newly_graduate_hub/screens/skills_screen.dart';
-import 'dart:async';
+import 'package:google_fonts/google_fonts.dart';
 
 class MessagesScreen extends StatefulWidget {
   const MessagesScreen({super.key});
@@ -11,343 +9,160 @@ class MessagesScreen extends StatefulWidget {
 }
 
 class _MessagesScreenState extends State<MessagesScreen> {
-  final SupabaseService _supabaseService = SupabaseService();
-  final TextEditingController _messageController = TextEditingController();
-  
-  List<Map<String, dynamic>> _conversations = [];
-  List<Map<String, dynamic>> _messages = [];
-  Map<String, dynamic>? _currentConversation;
-  String? _currentUserId;
-  bool _isLoading = true;
-  bool _isLoadingMessages = false;
-  bool _isRecording = false;
-  Duration _recordingDuration = Duration.zero;
-  Timer? _recordingTimer;
-  StreamSubscription? _messagesSubscription;
-  StreamSubscription? _conversationsSubscription;
+  final TextEditingController _controller = TextEditingController();
+  final Color deepPurple = const Color(0xFF6C2786);
+  final List<Map<String, dynamic>> messages = [
+    {
+      'text':
+          "Hi I'm Seeking for job in your Organization, all the requirement for the job is available and i'm capable of handling thr role. sending this is to request for the link to apply for the post. thank you.",
+      'isMe': false,
+    },
+    {
+      'text':
+          "Hi, we are currently on the look out for motion graphics designer, please send your cv if you are skiiled in, thank you.",
+      'isMe': true,
+    },
+  ];
 
   @override
-  void initState() {
-    super.initState();
-    _initializeMessages();
-  }
-
-  Future<void> _initializeMessages() async {
-    try {
-      final user = await _supabaseService.getCurrentUser();
-      if (user != null) {
-        _currentUserId = user.id;
-        await _loadConversations();
-        _supabaseService.initializeMessaging();
-        _listenToConversations();
-      }
-    } catch (e) {
-      print('Error initializing messages: $e');
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
-    }
-  }
-
-  Future<void> _loadConversations() async {
-    try {
-      final conversations = await _supabaseService.getConversations(_currentUserId!);
-      setState(() {
-        _conversations = conversations;
-      });
-    } catch (e) {
-      print('Error loading conversations: $e');
-    }
-  }
-
-  void _listenToConversations() {
-    _conversationsSubscription = _supabaseService.listenToConversations(_currentUserId!).listen((conversations) {
-      setState(() {
-        _conversations = conversations;
-      });
-    });
-  }
-
-  Future<void> _loadMessages(String conversationId) async {
-    setState(() {
-      _isLoadingMessages = true;
-    });
-
-    try {
-      final messages = await _supabaseService.getMessages(conversationId);
-      setState(() {
-        _messages = messages;
-      });
-      
-      // Listen to new messages
-      _messagesSubscription?.cancel();
-      _messagesSubscription = _supabaseService.listenToMessages(conversationId).listen((messages) {
-        setState(() {
-          _messages = messages;
-        });
-      });
-    } catch (e) {
-      print('Error loading messages: $e');
-    } finally {
-      setState(() {
-        _isLoadingMessages = false;
-      });
-    }
-  }
-
-  Future<void> _sendMessage() async {
-    final messageText = _messageController.text.trim();
-    if (messageText.isEmpty || _currentConversation == null) return;
-
-    try {
-      await _supabaseService.sendMessage(
-        conversationId: _currentConversation!['id'],
-        senderId: _currentUserId!,
-        receiverId: _currentConversation!['participant1_id'] == _currentUserId 
-            ? _currentConversation!['participant2_id'] 
-            : _currentConversation!['participant1_id'],
-        content: messageText,
-        messageType: 'text',
-      );
-      _messageController.clear();
-    } catch (e) {
-      print('Error sending message: $e');
-    }
-  }
-
-  Future<void> _initiateVoiceCall() async {
-    if (_currentUserId == null) return;
-
-    try {
-      final callId = await _supabaseService.initiateVoiceCall(
-        callerId: _currentUserId!,
-        receiverId: _currentConversation!['participant1_id'] == _currentUserId 
-            ? _currentConversation!['participant2_id'] 
-            : _currentConversation!['participant1_id'],
-      );
-      
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Voice call initiated: $callId')),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to initiate call: $e')),
-      );
-    }
-  }
-
-  void _selectConversation(Map<String, dynamic> conversation) {
-    setState(() {
-      _currentConversation = conversation;
-    });
-    _loadMessages(conversation['id']);
-  }
-
-  Widget _buildConversationsList() {
-    if (_conversations.isEmpty) {
-      return const Center(
-        child: Text('No conversations yet'),
-      );
-    }
-
-    return ListView.builder(
-      itemCount: _conversations.length,
-      itemBuilder: (context, index) {
-        final conversation = _conversations[index];
-        final otherParticipant = conversation['participants'].firstWhere(
-          (p) => p['user_id'] != _currentUserId,
-        );
-
-        return ListTile(
-          leading: CircleAvatar(
-            backgroundImage: otherParticipant['profile_image'] != null
-                ? NetworkImage(otherParticipant['profile_image'])
-                : null,
-            child: otherParticipant['profile_image'] == null
-                ? Text(otherParticipant['full_name'][0].toUpperCase())
-                : null,
+  Widget build(BuildContext context) {
+    return Scaffold(
+      resizeToAvoidBottomInset: true,
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: Image.asset('assets/pages_assets/ChevronLeftOutline.png', width: 24, height: 24),
+          onPressed: () => Navigator.pop(context),
+        ),
+        centerTitle: true,
+        title: Text(
+          'Messages',
+          style: GoogleFonts.poppins(
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+            fontSize: 22,
           ),
-          title: Text(otherParticipant['full_name']),
-          subtitle: Text(conversation['last_message'] ?? 'No messages yet'),
-          onTap: () => _selectConversation(conversation),
-        );
-      },
+        ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 16),
+            child: Image.asset('assets/pages_items/Bell.png', width: 26, height: 26),
+          ),
+        ],
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            child: ListView.builder(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              itemCount: messages.length,
+              itemBuilder: (context, index) {
+                final msg = messages[index];
+                return _buildChatBubble(msg['text'], msg['isMe']);
+              },
+            ),
+          ),
+          _buildInputBar(),
+        ],
+      ),
     );
   }
 
-  Widget _buildMessageBubble(Map<String, dynamic> message) {
-    final isMe = message['sender_id'] == _currentUserId;
-    final messageType = message['message_type'] ?? 'text';
-
-    return Align(
-      alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
-      child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: isMe ? Colors.blue : Colors.grey[300],
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (messageType == 'text')
-              Text(
-                message['content'],
-                style: TextStyle(
-                  color: isMe ? Colors.white : Colors.black,
-                  fontSize: 16,
+  Widget _buildChatBubble(String text, bool isMe) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        mainAxisAlignment: isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          if (!isMe)
+            const CircleAvatar(
+              radius: 16,
+              backgroundImage: AssetImage('assets/preloader_assets/charco_education.png'),
+            ),
+          if (!isMe) const SizedBox(width: 6),
+          Flexible(
+            child: Container(
+              decoration: BoxDecoration(
+                color: isMe ? const Color(0xFFF8F6FF) : Colors.white,
+                border: Border.all(
+                  color: deepPurple.withOpacity(0.7),
+                  width: 2,
+                ),
+                borderRadius: BorderRadius.only(
+                  topLeft: const Radius.circular(16),
+                  topRight: const Radius.circular(16),
+                  bottomLeft: Radius.circular(isMe ? 16 : 0),
+                  bottomRight: Radius.circular(isMe ? 0 : 16),
                 ),
               ),
-            if (messageType == 'voice')
-              _buildVoiceMessage(message),
-            const SizedBox(height: 4),
-            Text(
-              _formatTimestamp(message['created_at']),
-              style: TextStyle(
-                color: isMe ? Colors.white70 : Colors.grey[600],
-                fontSize: 12,
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              child: Text(
+                text,
+                style: GoogleFonts.poppins(fontSize: 14, color: Colors.black87),
               ),
+            ),
+          ),
+          if (isMe) const SizedBox(width: 6),
+          if (isMe)
+            const CircleAvatar(
+              radius: 16,
+              backgroundImage: AssetImage('assets/preloader_assets/charco_education.png'),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInputBar() {
+    return SafeArea(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        color: Colors.white,
+        child: Row(
+          children: [
+            GestureDetector(
+              onTap: () {},
+              child: Image.asset('assets/pages_assets/upload_files.png', width: 24, height: 24),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: TextField(
+                controller: _controller,
+                decoration: InputDecoration(
+                  hintText: 'Type a message',
+                  hintStyle: GoogleFonts.poppins(color: Colors.grey, fontSize: 15),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.grey.shade300),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  filled: true,
+                  fillColor: Colors.white,
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            GestureDetector(
+              onTap: () {},
+              child: Image.asset('assets/pages_assets/Camera.png', width: 24, height: 24),
+            ),
+            const SizedBox(width: 8),
+            GestureDetector(
+              onTap: () {
+                if (_controller.text.trim().isEmpty) return;
+                setState(() {
+                  messages.add({'text': _controller.text.trim(), 'isMe': true});
+                  _controller.clear();
+                });
+              },
+              child: Image.asset('assets/pages_assets/sender.png', width: 24, height: 24),
             ),
           ],
         ),
       ),
     );
-  }
-
-  Widget _buildVoiceMessage(Map<String, dynamic> message) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(
-          Icons.play_arrow,
-          color: Colors.white,
-          size: 24,
-        ),
-        const SizedBox(width: 8),
-        Text(
-          'Voice Message',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 14,
-          ),
-        ),
-      ],
-    );
-  }
-
-  String _formatTimestamp(String? timestamp) {
-    if (timestamp == null) return '';
-    final date = DateTime.parse(timestamp);
-    return '${date.hour}:${date.minute.toString().padLeft(2, '0')}';
-  }
-
-  Widget _buildInputBar() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.2),
-            spreadRadius: 1,
-            blurRadius: 3,
-            offset: const Offset(0, -1),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: TextField(
-              controller: _messageController,
-              decoration: InputDecoration(
-                hintText: 'Type a message',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(25),
-                  borderSide: BorderSide.none,
-                ),
-                filled: true,
-                fillColor: Colors.grey[100],
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 10,
-                ),
-              ),
-              onSubmitted: (_) => _sendMessage(),
-            ),
-          ),
-          const SizedBox(width: 8),
-          Container(
-            decoration: BoxDecoration(
-              color: Colors.blue,
-              borderRadius: BorderRadius.circular(25),
-            ),
-            child: IconButton(
-              onPressed: _sendMessage,
-              icon: const Icon(Icons.send, color: Colors.white),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          _currentConversation != null ? 'Chat' : 'Messages',
-        ),
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
-        actions: [
-          if (_currentConversation != null)
-            IconButton(
-              onPressed: () {
-                setState(() {
-                  _currentConversation = null;
-                  _messages.clear();
-                });
-              },
-              icon: const Icon(Icons.arrow_back),
-            ),
-        ],
-      ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : Column(
-              children: [
-                if (_currentConversation == null)
-                  Expanded(child: _buildConversationsList())
-                else
-                  Expanded(
-                    child: _isLoadingMessages
-                        ? const Center(child: CircularProgressIndicator())
-                        : _messages.isEmpty
-                            ? const Center(child: Text('No messages yet'))
-                            : ListView.builder(
-                                itemCount: _messages.length,
-                                itemBuilder: (context, index) {
-                                  final message = _messages[index];
-                                  return _buildMessageBubble(message);
-                                },
-                              ),
-                  ),
-                if (_currentConversation != null) _buildInputBar(),
-              ],
-            ),
-    );
-  }
-
-  @override
-  void dispose() {
-    _messageController.dispose();
-    _recordingTimer?.cancel();
-    _messagesSubscription?.cancel();
-    _conversationsSubscription?.cancel();
-    super.dispose();
   }
 }
