@@ -8,8 +8,8 @@ if ! command -v flutter >/dev/null 2>&1; then
   if [ -d flutter-sdk ]; then
     echo "📦 Using cached Flutter SDK in flutter-sdk/"
   else
-    echo "📦 Installing Flutter (stable)..."
-    git clone https://github.com/flutter/flutter.git -b stable flutter-sdk
+    echo "📦 Installing Flutter (3.24.5)..."
+    git clone https://github.com/flutter/flutter.git -b 3.24.5 flutter-sdk
   fi
   export PATH="$PWD/flutter-sdk/bin:$PATH"
   flutter --version
@@ -29,9 +29,9 @@ flutter pub get
 echo "🧹 Cleaning previous builds..."
 flutter clean
 
-# Build for web
+# Build for web with specific renderer
 echo "🔨 Building Flutter web app..."
-flutter build web --release --web-renderer html
+flutter build web --release --web-renderer html --no-tree-shake-icons
 
 echo "✅ Build completed successfully!"
 echo "📁 Build output: build/web/"

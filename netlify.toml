@@ -4,7 +4,7 @@
   functions = "netlify/functions"
 
 [build.environment]
-  FLUTTER_VERSION = "3.19.0"
+  FLUTTER_VERSION = "3.24.5"
   NODE_VERSION = "18"
 
 [[redirects]]

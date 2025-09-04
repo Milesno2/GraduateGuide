@@ -1,168 +1,128 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'dart:typed_data';
-import 'dart:async';
+import 'dart:io';
+import 'package:permission_handler/permission_handler.dart';
 
 class SupabaseService {
-  // Production Supabase Configuration
-  static const String _supabaseUrl = 'https://your-project.supabase.co';
-  static const String _supabaseAnonKey = 'your-anon-key';
-  
-  late SupabaseClient _supabase;
-  late RealtimeChannel _messagesChannel;
-  late RealtimeChannel _notificationsChannel;
+  static const String supabaseUrl = 'https://zqcykjxwsnlxmtzcmiga.supabase.co';
+  static const String supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpxY3lranh3c25seG10emNtaWdhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY4NDI4MDgsImV4cCI6MjA3MjQxODgwOH0.dkH258TCMv4q7XXLknfnLNCJu1LVqEGdzabsh-0Oj7s';
 
-  // Singleton pattern
   static final SupabaseService _instance = SupabaseService._internal();
   factory SupabaseService() => _instance;
   SupabaseService._internal();
 
+  late final SupabaseClient _supabase;
+  RealtimeChannel? _messagesChannel;
+  RealtimeChannel? _notificationsChannel;
+
   Future<void> initialize() async {
     await Supabase.initialize(
-      url: _supabaseUrl,
-      anonKey: _supabaseAnonKey,
-      realtimeClientOptions: const RealtimeClientOptions(
-        logLevel: RealtimeLogLevel.info,
-      ),
+      url: supabaseUrl,
+      anonKey: supabaseAnonKey,
     );
     _supabase = Supabase.instance.client;
-    _initializeRealtimeChannels();
   }
 
-  void _initializeRealtimeChannels() {
-    _messagesChannel = _supabase.channel('messages');
-    _notificationsChannel = _supabase.channel('notifications');
-  }
-
-  // ==================== AUTHENTICATION ====================
-  
-  Future<AuthResponse> signUp({
-    required String email,
-    required String password,
-    required String firstName,
-    required String lastName,
-    required String phone,
-    required String gender,
-    required String university,
-    required String graduationYear,
-    required String course,
-    required String profession,
-    String? profileImage,
-  }) async {
-    try {
-      final response = await _supabase.auth.signUp(
-        email: email,
-        password: password,
-        data: {
-          'first_name': firstName,
-          'last_name': lastName,
-          'phone': phone,
-          'gender': gender,
-          'university': university,
-          'graduation_year': graduationYear,
-          'course': course,
-          'profession': profession,
-        },
-      );
-
-      if (response.user != null) {
-        // Create user profile
-        await _createUserProfile(response.user!, {
-          'first_name': firstName,
-          'last_name': lastName,
-          'phone': phone,
-          'gender': gender,
-          'university': university,
-          'graduation_year': graduationYear,
-          'course': course,
-          'profession': profession,
-          'profile_image_url': profileImage,
-        });
-
-        // Create welcome notification
-        await createNotification(
-          userId: response.user!.id,
-          title: 'Welcome to Graduate Guide! 🎉',
-          message: 'Your account was created successfully. Start exploring our features to build your career.',
-          type: 'welcome',
-          priority: 'high',
-        );
-
-        // Initialize user data
-        await _initializeUserData(response.user!.id);
-      }
-
-      return response;
-    } catch (e) {
-      print('Sign up error: $e');
-      rethrow;
-    }
-  }
-
-  Future<AuthResponse> signIn({
-    required String email,
-    required String password,
-  }) async {
-    try {
-      final response = await _supabase.auth.signInWithPassword(
-        email: email,
-        password: password,
-      );
-      
-      if (response.user != null) {
-        // Update last login
-        await _updateLastLogin(response.user!.id);
-      }
-      
-      return response;
-    } catch (e) {
-      print('Sign in error: $e');
-      rethrow;
-    }
-  }
-
-  Future<void> signOut() async {
-    try {
-      await _supabase.auth.signOut();
-      _disconnectRealtimeChannels();
-    } catch (e) {
-      print('Sign out error: $e');
-      rethrow;
-    }
-  }
+  SupabaseClient get client => _supabase;
 
   User? getCurrentUser() {
     return _supabase.auth.currentUser;
   }
 
-  Stream<AuthState> authStateChanges() {
-    return _supabase.auth.onAuthStateChange;
+  // ==================== AUTHENTICATION ====================
+
+  Future<bool> signUp({
+    required String email,
+    required String password,
+    required String name,
+    required String phone,
+    required String gender,
+    required String university,
+    required String graduationYear,
+    required String course,
+  }) async {
+    try {
+      final AuthResponse response = await _supabase.auth.signUp(
+        email: email,
+        password: password,
+        data: {
+          'name': name,
+          'phone': phone,
+          'gender': gender,
+          'university': university,
+          'graduation_year': graduationYear,
+          'course': course,
+        },
+      );
+
+      if (response.user != null) {
+        await _createUserProfile(response.user!);
+        return true;
+      }
+      return false;
+    } catch (e) {
+      print('Sign up error: $e');
+      return false;
+    }
   }
 
-  // ==================== USER PROFILE MANAGEMENT ====================
-
-  Future<void> _createUserProfile(User user, Map<String, dynamic> profileData) async {
+  Future<bool> signIn({
+    required String email,
+    required String password,
+  }) async {
     try {
-      await _supabase.from('user_profiles').insert({
+      final AuthResponse response = await _supabase.auth.signInWithPassword(
+        email: email,
+        password: password,
+      );
+
+      if (response.user != null) {
+        await _updateLastLogin(response.user!.id);
+        return true;
+      }
+      return false;
+    } catch (e) {
+      print('Sign in error: $e');
+      return false;
+    }
+  }
+
+  Future<void> signOut() async {
+    await _disconnectRealtimeChannels();
+    await _supabase.auth.signOut();
+  }
+
+  // ==================== USER PROFILE ====================
+
+  Future<void> _createUserProfile(User user) async {
+    try {
+      await _supabase.from('users').insert({
         'id': user.id,
         'email': user.email,
-        ...profileData,
-        'created_at': DateTime.now().toIso8601String(),
-        'updated_at': DateTime.now().toIso8601String(),
-        'is_online': true,
-        'last_seen': DateTime.now().toIso8601String(),
+        'first_name': user.userMetadata?['name']?.toString().split(' ').first ?? '',
+        'last_name': user.userMetadata?['name']?.toString().split(' ').last ?? '',
+        'profession': user.userMetadata?['course'] ?? '',
+        'graduation_year': user.userMetadata?['graduation_year'] ?? '',
+        'school': user.userMetadata?['university'] ?? '',
       });
     } catch (e) {
       print('Create user profile error: $e');
-      rethrow;
+    }
+  }
+
+  Future<void> _updateLastLogin(String userId) async {
+    try {
+      await _supabase.from('users').update({
+        'last_login': DateTime.now().toIso8601String(),
+      }).eq('id', userId);
+    } catch (e) {
+      print('Update last login error: $e');
     }
   }
 
   Future<Map<String, dynamic>?> getUserProfile(String userId) async {
     try {
       final response = await _supabase
-          .from('user_profiles')
+          .from('users')
           .select()
           .eq('id', userId)
           .single();
@@ -173,15 +133,9 @@ class SupabaseService {
     }
   }
 
-  Future<bool> updateUserProfile(String userId, Map<String, dynamic> data) async {
+  Future<bool> updateUserProfile(String userId, Map<String, dynamic> updates) async {
     try {
-      await _supabase
-          .from('user_profiles')
-          .update({
-            ...data,
-            'updated_at': DateTime.now().toIso8601String(),
-          })
-          .eq('id', userId);
+      await _supabase.from('users').update(updates).eq('id', userId);
       return true;
     } catch (e) {
       print('Update user profile error: $e');
@@ -189,67 +143,92 @@ class SupabaseService {
     }
   }
 
-  Future<void> _updateLastLogin(String userId) async {
+  // ==================== FILE UPLOAD ====================
+
+  Future<String?> uploadFile(String bucket, String path, File file) async {
     try {
-      await _supabase
-          .from('user_profiles')
-          .update({
-            'last_login': DateTime.now().toIso8601String(),
-            'is_online': true,
-          })
-          .eq('id', userId);
+      final response = await _supabase.storage.from(bucket).upload(path, file);
+      return _supabase.storage.from(bucket).getPublicUrl(response);
     } catch (e) {
-      print('Update last login error: $e');
+      print('Upload file error: $e');
+      return null;
+    }
+  }
+
+  Future<String?> uploadProfileImage(String userId, File imageFile) async {
+    try {
+      final fileName = 'profile_$userId.jpg';
+      final response = await _supabase.storage
+          .from('profile-images')
+          .upload(fileName, imageFile);
+      
+      final publicUrl = _supabase.storage
+          .from('profile-images')
+          .getPublicUrl(response);
+      
+      await updateUserProfile(userId, {'profile_image': publicUrl});
+      return publicUrl;
+    } catch (e) {
+      print('Upload profile image error: $e');
+      return null;
+    }
+  }
+
+  Future<String?> uploadVoiceMessage(String conversationId, File audioFile) async {
+    try {
+      final fileName = 'voice_${DateTime.now().millisecondsSinceEpoch}.m4a';
+      final path = '$conversationId/$fileName';
+      
+      final response = await _supabase.storage
+          .from('voice-messages')
+          .upload(path, audioFile);
+      
+      return _supabase.storage
+          .from('voice-messages')
+          .getPublicUrl(response);
+    } catch (e) {
+      print('Upload voice message error: $e');
+      return null;
     }
   }
 
   // ==================== REAL-TIME MESSAGING ====================
 
-  Future<void> initializeMessaging() async {
-    final user = getCurrentUser();
-    if (user == null) return;
-
-    try {
-      // Subscribe to personal messages
-      _messagesChannel
-          .on(
-            RealtimeListenTypes.postgresChanges,
-            ChannelFilter(
-              event: 'INSERT',
-              schema: 'public',
-              table: 'messages',
-              filter: 'recipient_id=eq.${user.id}',
-            ),
-            (payload, [ref]) {
-              _handleNewMessage(payload);
-            },
-          )
-          .on(
-            RealtimeListenTypes.postgresChanges,
-            ChannelFilter(
-              event: 'UPDATE',
-              schema: 'public',
-              table: 'messages',
-              filter: 'recipient_id=eq.${user.id}',
-            ),
-            (payload, [ref]) {
-              _handleMessageUpdate(payload);
-            },
-          )
-          .subscribe();
-    } catch (e) {
-      print('Initialize messaging error: $e');
-    }
+  void initializeMessaging() {
+    _messagesChannel = _supabase.channel('messages')
+      .on(
+        RealtimeListenTypes.postgresChanges,
+        ChannelFilter(
+          event: 'INSERT',
+          schema: 'public',
+          table: 'messages',
+        ),
+        (payload, [ref]) {
+          _handleNewMessage(payload);
+        },
+      )
+      .on(
+        RealtimeListenTypes.postgresChanges,
+        ChannelFilter(
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'messages',
+        ),
+        (payload, [ref]) {
+          _handleMessageUpdate(payload);
+        },
+      )
+      .subscribe();
   }
 
   void _handleNewMessage(Map<String, dynamic> payload) {
     // Handle new message notification
-    print('New message received: $payload');
+    print('New message received: ${payload['new']}');
   }
 
   void _handleMessageUpdate(Map<String, dynamic> payload) {
-    // Handle message updates (read status, etc.)
-    print('Message updated: $payload');
+    // Handle message update (e.g., read status)
+    print('Message updated: ${payload['new']}');
   }
 
   Future<List<Map<String, dynamic>>> getConversations(String userId) async {
@@ -258,20 +237,12 @@ class SupabaseService {
           .from('conversations')
           .select('''
             *,
-            participants:conversation_participants(
-              user_id,
-              user_profiles(id, first_name, last_name, profile_image_url, university, is_online, last_seen)
-            ),
-            last_message:messages(
-              id,
-              content,
-              message_type,
-              created_at,
-              sender_id
-            )
+            participant1:users!conversations_participant1_id_fkey(id, first_name, last_name, profile_image),
+            participant2:users!conversations_participant2_id_fkey(id, first_name, last_name, profile_image),
+            last_message:messages!conversations_last_message_id_fkey(content, created_at)
           ''')
-          .eq('participants.user_id', userId)
-          .order('last_message.created_at', ascending: false);
+          .or('participant1_id.eq.$userId,participant2_id.eq.$userId')
+          .order('last_message_at', ascending: false);
 
       return List<Map<String, dynamic>>.from(response);
     } catch (e) {
@@ -284,10 +255,7 @@ class SupabaseService {
     try {
       final response = await _supabase
           .from('messages')
-          .select('''
-            *,
-            sender:user_profiles(id, first_name, last_name, profile_image_url)
-          ''')
+          .select('*, sender:users!messages_sender_id_fkey(first_name, last_name, profile_image)')
           .eq('conversation_id', conversationId)
           .order('created_at', ascending: true);
 
@@ -298,52 +266,36 @@ class SupabaseService {
     }
   }
 
-  Future<String?> sendMessage({
+  Future<bool> sendMessage({
     required String conversationId,
     required String senderId,
+    required String receiverId,
     required String content,
-    required String messageType, // text, voice, image, file
     String? voiceUrl,
-    String? fileUrl,
-    int? voiceDuration,
+    String messageType = 'text',
   }) async {
     try {
-      final response = await _supabase.from('messages').insert({
+      await _supabase.from('messages').insert({
         'conversation_id': conversationId,
         'sender_id': senderId,
+        'receiver_id': receiverId,
         'content': content,
-        'message_type': messageType,
         'voice_url': voiceUrl,
-        'file_url': fileUrl,
-        'voice_duration': voiceDuration,
-        'created_at': DateTime.now().toIso8601String(),
-      }).select().single();
-
-      // Update conversation last message
-      await _supabase
-          .from('conversations')
-          .update({
-            'last_message_id': response['id'],
-            'updated_at': DateTime.now().toIso8601String(),
-          })
-          .eq('id', conversationId);
-
-      return response['id'];
+        'message_type': messageType,
+      });
+      return true;
     } catch (e) {
       print('Send message error: $e');
-      return null;
+      return false;
     }
   }
 
-  Future<bool> markMessageAsRead(String messageId, String userId) async {
+  Future<bool> markMessageAsRead(String messageId) async {
     try {
-      await _supabase
-          .from('messages')
-          .update({
-            'read_at': DateTime.now().toIso8601String(),
-            'read_by': userId,
-          })
-          .eq('id', messageId);
+      await _supabase.from('messages').update({
+        'is_read': true,
+        'read_at': DateTime.now().toIso8601String(),
+      }).eq('id', messageId);
       return true;
     } catch (e) {
       print('Mark message as read error: $e');
@@ -351,61 +303,35 @@ class SupabaseService {
     }
   }
 
-  // ==================== VOICE MESSAGING ====================
-
-  Future<String?> uploadVoiceMessage(Uint8List audioData, String fileName) async {
-    try {
-      final bucket = _supabase.storage.from('voice-messages');
-      final filePath = '${DateTime.now().millisecondsSinceEpoch}_$fileName';
-      
-      await bucket.uploadBinary(
-        filePath,
-        audioData,
-        fileOptions: const FileOptions(
-          contentType: 'audio/m4a',
-          upsert: false,
-        ),
-      );
-
-      return bucket.getPublicUrl(filePath);
-    } catch (e) {
-      print('Upload voice message error: $e');
-      return null;
-    }
-  }
-
   // ==================== VOICE CALLS ====================
 
-  Future<String?> initiateVoiceCall({
+  Future<bool> initiateVoiceCall({
     required String callerId,
     required String receiverId,
-    required String callType, // audio, video
   }) async {
     try {
-      final response = await _supabase.from('voice_calls').insert({
+      await _supabase.from('voice_calls').insert({
         'caller_id': callerId,
         'receiver_id': receiverId,
-        'call_type': callType,
-        'status': 'initiating',
-        'created_at': DateTime.now().toIso8601String(),
-      }).select().single();
-
-      return response['id'];
+        'status': 'initiated',
+      });
+      return true;
     } catch (e) {
       print('Initiate voice call error: $e');
-      return null;
+      return false;
     }
   }
 
   Future<bool> updateCallStatus(String callId, String status) async {
     try {
-      await _supabase
-          .from('voice_calls')
-          .update({
-            'status': status,
-            'updated_at': DateTime.now().toIso8601String(),
-          })
-          .eq('id', callId);
+      final updates = {'status': status};
+      if (status == 'answered') {
+        updates['started_at'] = DateTime.now().toIso8601String();
+      } else if (status == 'ended') {
+        updates['ended_at'] = DateTime.now().toIso8601String();
+      }
+
+      await _supabase.from('voice_calls').update(updates).eq('id', callId);
       return true;
     } catch (e) {
       print('Update call status error: $e');
@@ -415,42 +341,34 @@ class SupabaseService {
 
   // ==================== NOTIFICATIONS ====================
 
-  Future<void> initializeNotifications() async {
-    final user = getCurrentUser();
-    if (user == null) return;
-
-    try {
-      _notificationsChannel
-          .on(
-            RealtimeListenTypes.postgresChanges,
-            ChannelFilter(
-              event: 'INSERT',
-              schema: 'public',
-              table: 'notifications',
-              filter: 'user_id=eq.${user.id}',
-            ),
-            (payload, [ref]) {
-              _handleNewNotification(payload);
-            },
-          )
-          .subscribe();
-    } catch (e) {
-      print('Initialize notifications error: $e');
-    }
+  void initializeNotifications() {
+    _notificationsChannel = _supabase.channel('notifications')
+      .on(
+        RealtimeListenTypes.postgresChanges,
+        ChannelFilter(
+          event: 'INSERT',
+          schema: 'public',
+          table: 'notifications',
+        ),
+        (payload, [ref]) {
+          _handleNewNotification(payload);
+        },
+      )
+      .subscribe();
   }
 
   void _handleNewNotification(Map<String, dynamic> payload) {
     // Handle new notification
-    print('New notification: $payload');
+    print('New notification received: ${payload['new']}');
   }
 
   Future<bool> createNotification({
     required String userId,
     required String title,
     required String message,
-    required String type,
+    String type = 'general',
     String priority = 'normal',
-    Map<String, dynamic>? metadata,
+    String? actionUrl,
   }) async {
     try {
       await _supabase.from('notifications').insert({
@@ -459,9 +377,7 @@ class SupabaseService {
         'message': message,
         'type': type,
         'priority': priority,
-        'metadata': metadata,
-        'is_read': false,
-        'created_at': DateTime.now().toIso8601String(),
+        'action_url': actionUrl,
       });
       return true;
     } catch (e) {
@@ -478,6 +394,7 @@ class SupabaseService {
           .eq('user_id', userId)
           .order('created_at', ascending: false)
           .limit(50);
+
       return List<Map<String, dynamic>>.from(response);
     } catch (e) {
       print('Get user notifications error: $e');
@@ -487,13 +404,10 @@ class SupabaseService {
 
   Future<bool> markNotificationAsRead(String notificationId) async {
     try {
-      await _supabase
-          .from('notifications')
-          .update({
-            'is_read': true,
-            'read_at': DateTime.now().toIso8601String(),
-          })
-          .eq('id', notificationId);
+      await _supabase.from('notifications').update({
+        'is_read': true,
+        'read_at': DateTime.now().toIso8601String(),
+      }).eq('id', notificationId);
       return true;
     } catch (e) {
       print('Mark notification as read error: $e');
@@ -508,6 +422,7 @@ class SupabaseService {
           .select('id', count: CountOption.exact)
           .eq('user_id', userId)
           .eq('is_read', false);
+
       return response.count ?? 0;
     } catch (e) {
       print('Get unread notification count error: $e');
@@ -522,7 +437,9 @@ class SupabaseService {
       final response = await _supabase
           .from('skills')
           .select()
-          .order('name', ascending: true);
+          .eq('is_active', true)
+          .order('name');
+
       return List<Map<String, dynamic>>.from(response);
     } catch (e) {
       print('Get available skills error: $e');
@@ -539,7 +456,8 @@ class SupabaseService {
             skill:skills(*)
           ''')
           .eq('user_id', userId)
-          .order('created_at', ascending: false);
+          .order('enrolled_at', ascending: false);
+
       return List<Map<String, dynamic>>.from(response);
     } catch (e) {
       print('Get user skills error: $e');
@@ -547,14 +465,15 @@ class SupabaseService {
     }
   }
 
-  Future<bool> addUserSkill(String userId, String skillId, int proficiencyLevel) async {
+  Future<bool> addUserSkill({
+    required String userId,
+    required String skillId,
+  }) async {
     try {
       await _supabase.from('user_skills').insert({
         'user_id': userId,
         'skill_id': skillId,
-        'proficiency_level': proficiencyLevel,
-        'progress': 0,
-        'created_at': DateTime.now().toIso8601String(),
+        'progress': 0.0,
       });
       return true;
     } catch (e) {
@@ -563,15 +482,22 @@ class SupabaseService {
     }
   }
 
-  Future<bool> updateSkillProgress(String userSkillId, int progress) async {
+  Future<bool> updateSkillProgress({
+    required String userSkillId,
+    required double progress,
+    String? nextMilestone,
+  }) async {
     try {
-      await _supabase
-          .from('user_skills')
-          .update({
-            'progress': progress,
-            'updated_at': DateTime.now().toIso8601String(),
-          })
-          .eq('id', userSkillId);
+      final updates = {
+        'progress': progress,
+        'last_activity': DateTime.now().toIso8601String(),
+      };
+      
+      if (nextMilestone != null) {
+        updates['next_milestone'] = nextMilestone;
+      }
+
+      await _supabase.from('user_skills').update(updates).eq('id', userSkillId);
       return true;
     } catch (e) {
       print('Update skill progress error: $e');
@@ -583,16 +509,13 @@ class SupabaseService {
 
   Future<List<Map<String, dynamic>>> getJobRecommendations(String userId) async {
     try {
-      final userProfile = await getUserProfile(userId);
-      if (userProfile == null) return [];
-
       final response = await _supabase
           .from('jobs')
           .select()
           .eq('is_active', true)
           .order('created_at', ascending: false)
           .limit(20);
-      
+
       return List<Map<String, dynamic>>.from(response);
     } catch (e) {
       print('Get job recommendations error: $e');
@@ -600,14 +523,18 @@ class SupabaseService {
     }
   }
 
-  Future<bool> applyForJob(String userId, String jobId, Map<String, dynamic> applicationData) async {
+  Future<bool> applyForJob({
+    required String jobId,
+    required String userId,
+    String? coverLetter,
+    String? resumeUrl,
+  }) async {
     try {
       await _supabase.from('job_applications').insert({
-        'user_id': userId,
         'job_id': jobId,
-        'status': 'pending',
-        'application_data': applicationData,
-        'created_at': DateTime.now().toIso8601String(),
+        'user_id': userId,
+        'cover_letter': coverLetter,
+        'resume_url': resumeUrl,
       });
       return true;
     } catch (e) {
@@ -616,58 +543,67 @@ class SupabaseService {
     }
   }
 
-  // ==================== CAREER AI ASSISTANT ====================
+  // ==================== CAREER AI ====================
 
   Future<Map<String, dynamic>> getCareerAdvice({
     required String userId,
     required String query,
-    Map<String, dynamic>? context,
+    String sessionType = 'career_guidance',
   }) async {
     try {
-      final userProfile = await getUserProfile(userId);
-      
-      // In production, this would call an AI service
-      // For now, return intelligent responses based on query
-      return _generateCareerAdvice(query, userProfile);
+      // Save the user query
+      await _supabase.from('career_sessions').insert({
+        'user_id': userId,
+        'session_type': sessionType,
+        'title': 'Career Advice Session',
+        'content': query,
+      });
+
+      // Generate AI response (mock for now)
+      final response = await _generateCareerAdvice(query);
+      return response;
     } catch (e) {
-      print('Career AI error: $e');
+      print('Get career advice error: $e');
       return {
-        'advice': 'I\'m sorry, I encountered an error. Please try again.',
+        'advice': 'I apologize, but I\'m having trouble processing your request right now. Please try again later.',
         'type': 'error',
-        'confidence': 0.0,
+        'suggestions': ['Try rephrasing your question', 'Check your internet connection'],
       };
     }
   }
 
-  Map<String, dynamic> _generateCareerAdvice(String query, Map<String, dynamic>? profile) {
+  Future<Map<String, dynamic>> _generateCareerAdvice(String query) async {
+    // Mock AI response - in production, this would call an actual AI service
     final queryLower = query.toLowerCase();
     
     if (queryLower.contains('resume') || queryLower.contains('cv')) {
       return {
-        'advice': 'Here are professional resume tips:\n\n1. Keep it concise (1-2 pages)\n2. Use action verbs and quantify achievements\n3. Tailor to job description\n4. Include relevant skills and certifications\n5. Proofread thoroughly\n6. Use professional formatting',
+        'advice': 'Resume Writing Tips:\n\n1. Use clear, concise language\n2. Highlight relevant achievements\n3. Include specific metrics and results\n4. Tailor to job description\n5. Use professional formatting\n6. Proofread thoroughly',
         'type': 'resume_tips',
-        'confidence': 0.95,
-        'suggestions': ['Update your resume', 'Get professional review', 'Practice interview questions'],
+        'suggestions': ['Use action verbs', 'Include quantifiable results', 'Keep it to 1-2 pages'],
       };
     } else if (queryLower.contains('interview')) {
       return {
-        'advice': 'Interview preparation guide:\n\n1. Research the company thoroughly\n2. Practice common questions using STAR method\n3. Prepare questions to ask\n4. Dress professionally\n5. Arrive early\n6. Follow up with thank you email',
+        'advice': 'Interview Preparation:\n\n1. Research the company thoroughly\n2. Practice common questions\n3. Prepare your "tell me about yourself" story\n4. Dress professionally\n5. Bring extra copies of your resume\n6. Follow up with a thank you email',
         'type': 'interview_prep',
-        'confidence': 0.92,
-        'suggestions': ['Practice mock interviews', 'Research company culture', 'Prepare portfolio'],
+        'suggestions': ['Practice with a friend', 'Research company culture', 'Prepare questions to ask'],
       };
-    } else if (queryLower.contains('job') || queryLower.contains('career')) {
+    } else if (queryLower.contains('salary') || queryLower.contains('pay')) {
       return {
-        'advice': 'Career development strategies:\n\n1. Network actively in your field\n2. Continuously upgrade your skills\n3. Build a strong online presence\n4. Consider certifications\n5. Stay updated with industry trends\n6. Seek mentorship opportunities',
-        'type': 'career_paths',
-        'confidence': 0.88,
-        'suggestions': ['Join professional groups', 'Attend industry events', 'Build portfolio'],
+        'advice': 'Salary Negotiation Tips:\n\n1. Research market rates for your position\n2. Know your worth and minimum acceptable salary\n3. Practice your negotiation pitch\n4. Consider total compensation package\n5. Be confident but professional\n6. Have a backup plan',
+        'type': 'salary_negotiation',
+        'suggestions': ['Research industry standards', 'Practice your pitch', 'Consider benefits package'],
+      };
+    } else if (queryLower.contains('career') && queryLower.contains('change')) {
+      return {
+        'advice': 'Career Change Strategies:\n\n1. Assess your transferable skills\n2. Research your target industry\n3. Network with professionals in the field\n4. Consider additional education or certifications\n5. Start with side projects or volunteering\n6. Be patient with the transition process',
+        'type': 'career_change',
+        'suggestions': ['Identify transferable skills', 'Network in new field', 'Consider certifications'],
       };
     } else {
       return {
-        'advice': 'I\'m here to help with your career development! You can ask me about:\n\n• Resume writing and optimization\n• Interview preparation strategies\n• Job search techniques\n• Skill development recommendations\n• Career planning and goal setting\n• Industry insights and trends',
-        'type': 'general',
-        'confidence': 0.85,
+        'advice': 'Career Development Strategies:\n\n1. Network actively in your field\n2. Continuously upgrade your skills\n3. Build a strong online presence\n4. Consider certifications\n5. Stay updated with industry trends\n6. Seek mentorship opportunities',
+        'type': 'general_advice',
         'suggestions': ['Explore skills section', 'Check job opportunities', 'Update your profile'],
       };
     }
@@ -675,71 +611,18 @@ class SupabaseService {
 
   // ==================== UTILITY METHODS ====================
 
-  Future<void> _initializeUserData(String userId) async {
-    try {
-      // Initialize user preferences
-      await _supabase.from('user_preferences').insert({
-        'user_id': userId,
-        'notifications_enabled': true,
-        'email_notifications': true,
-        'push_notifications': true,
-        'created_at': DateTime.now().toIso8601String(),
-      });
-    } catch (e) {
-      print('Initialize user data error: $e');
-    }
-  }
-
   void _disconnectRealtimeChannels() {
-    try {
-      _messagesChannel.unsubscribe();
-      _notificationsChannel.unsubscribe();
-    } catch (e) {
-      print('Disconnect realtime channels error: $e');
-    }
+    _messagesChannel?.unsubscribe();
+    _notificationsChannel?.unsubscribe();
   }
 
-  // ==================== FILE UPLOAD ====================
-
-  Future<String?> uploadFile(Uint8List fileData, String fileName, String contentType) async {
-    try {
-      final bucket = _supabase.storage.from('user-files');
-      final filePath = '${DateTime.now().millisecondsSinceEpoch}_$fileName';
-      
-      await bucket.uploadBinary(
-        filePath,
-        fileData,
-        fileOptions: FileOptions(
-          contentType: contentType,
-          upsert: false,
-        ),
-      );
-
-      return bucket.getPublicUrl(filePath);
-    } catch (e) {
-      print('Upload file error: $e');
-      return null;
-    }
-  }
-
-  Future<String?> uploadProfileImage(Uint8List imageData, String userId) async {
-    try {
-      final bucket = _supabase.storage.from('profile-images');
-      final filePath = '${userId}_${DateTime.now().millisecondsSinceEpoch}.jpg';
-      
-      await bucket.uploadBinary(
-        filePath,
-        imageData,
-        fileOptions: const FileOptions(
-          contentType: 'image/jpeg',
-          upsert: true,
-        ),
-      );
-
-      return bucket.getPublicUrl(filePath);
-    } catch (e) {
-      print('Upload profile image error: $e');
-      return null;
-    }
+  Future<void> _initializeUserData(String userId) async {
+    // Initialize any user-specific data
+    await createNotification(
+      userId: userId,
+      title: 'Welcome to Graduate Assistant Hub!',
+      message: 'Start exploring skills, jobs, and career opportunities tailored for you.',
+      type: 'system',
+    );
   }
 } 

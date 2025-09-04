@@ -571,7 +571,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             textButtonTheme: TextButtonThemeData(
               style: TextButton.styleFrom(foregroundColor: deepPurple),
             ),
-            dialogTheme: DialogTheme(
+            dialogTheme: DialogThemeData(
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
               ),
