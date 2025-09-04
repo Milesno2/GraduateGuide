@@ -35,6 +35,12 @@ flutter pub get
 echo "🧹 Cleaning previous builds..."
 flutter clean
 
+# Ensure .env file exists
+if [ ! -f .env ]; then
+  echo "📝 Creating .env file from .env.example..."
+  cp .env.example .env
+fi
+
 # Build for web with specific renderer
 echo "🔨 Building Flutter web app..."
 flutter build web --release --web-renderer html --no-tree-shake-icons

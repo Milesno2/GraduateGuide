@@ -33,6 +33,7 @@ dev_dependencies:
 
 flutter:
   assets:
+    - .env
     - assets/preloader_assets/charco_education.png
     - assets/preloader_assets/fresh_folk_teaching.png
     - assets/preloader_assets/happy_bunch_chat.png

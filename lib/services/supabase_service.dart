@@ -1,10 +1,11 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'dart:io';
 import 'package:permission_handler/permission_handler.dart';
 
 class SupabaseService {
-  static const String supabaseUrl = 'https://zqcykjxwsnlxmtzcmiga.supabase.co';
-  static const String supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpxY3lranh3c25seG10emNtaWdhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY4NDI4MDgsImV4cCI6MjA3MjQxODgwOH0.dkH258TCMv4q7XXLknfnLNCJu1LVqEGdzabsh-0Oj7s';
+  static String get supabaseUrl => dotenv.env['SUPABASE_URL'] ?? 'https://zqcykjxwsnlxmtzcmiga.supabase.co';
+  static String get supabaseAnonKey => dotenv.env['SUPABASE_ANON_KEY'] ?? 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpxY3lranh3c25seG10emNtaWdhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY4NDI4MDgsImV4cCI6MjA3MjQxODgwOH0.dkH258TCMv4q7XXLknfnLNCJu1LVqEGdzabsh-0Oj7s';
 
   static final SupabaseService _instance = SupabaseService._internal();
   factory SupabaseService() => _instance;
@@ -15,6 +16,9 @@ class SupabaseService {
   RealtimeChannel? _notificationsChannel;
 
   Future<void> initialize() async {
+    // Load environment variables
+    await dotenv.load(fileName: ".env");
+    
     await Supabase.initialize(
       url: supabaseUrl,
       anonKey: supabaseAnonKey,
