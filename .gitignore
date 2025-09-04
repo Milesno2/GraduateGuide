@@ -51,3 +51,6 @@ app.*.map.json
 
 # Netlify
 .netlify
+
+# Local clones / temp
+_original_ui/
