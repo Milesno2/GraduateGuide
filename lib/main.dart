@@ -16,14 +16,33 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
   FlutterError.onError = (FlutterErrorDetails details) {
-    debugPrint('FlutterError: ${details.exceptionAsString()}');
+    debugPrint('[FlutterError] ${details.exceptionAsString()}');
     FlutterError.presentError(details);
+  };
+
+  ErrorWidget.builder = (FlutterErrorDetails details) {
+    return Material(
+      color: Colors.white,
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 600),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Text(
+              'An error occurred. Please refresh or try again later.\n\n${details.exceptionAsString()}',
+              style: const TextStyle(color: Colors.red, fontSize: 14),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ),
+      ),
+    );
   };
 
   runZonedGuarded(() {
     runApp(const NewlyGraduateHub());
   }, (error, stack) {
-    debugPrint('Zone error: $error');
+    debugPrint('[ZoneError] $error');
   });
 }
 
@@ -35,14 +54,8 @@ class NewlyGraduateHub extends StatefulWidget {
 }
 
 class _NewlyGraduateHubState extends State<NewlyGraduateHub> {
-  late final Future<void> _initFuture;
+  late Future<void> _initFuture = _initialize();
   Object? _initError;
-
-  @override
-  void initState() {
-    super.initState();
-    _initFuture = _initialize();
-  }
 
   Future<void> _initialize() async {
     try {
@@ -53,6 +66,13 @@ class _NewlyGraduateHubState extends State<NewlyGraduateHub> {
     }
   }
 
+  void _retryInit() {
+    setState(() {
+      _initError = null;
+      _initFuture = _initialize();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<void>(
@@ -60,6 +80,7 @@ class _NewlyGraduateHubState extends State<NewlyGraduateHub> {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return MaterialApp(
+            debugShowCheckedModeBanner: false,
             home: Scaffold(
               body: Center(
                 child: Column(
@@ -67,24 +88,46 @@ class _NewlyGraduateHubState extends State<NewlyGraduateHub> {
                   children: const [
                     CircularProgressIndicator(),
                     SizedBox(height: 12),
-                    Text('Loading...'),
+                    Text('Loading...')
                   ],
                 ),
               ),
             ),
           );
         }
+
         if (snapshot.hasError) {
+          final message = (_initError ?? snapshot.error).toString();
           return MaterialApp(
+            debugShowCheckedModeBanner: false,
             home: Scaffold(
-              backgroundColor: Colors.white,
+              appBar: AppBar(title: const Text('Initialization Error')),
               body: Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Text(
-                    'Initialization error. Please retry later.\n\n${_initError ?? snapshot.error}',
-                    style: const TextStyle(color: Colors.red),
-                    textAlign: TextAlign.center,
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 700),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text(
+                          'The app failed to start. Please check configuration.',
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          message,
+                          style: const TextStyle(color: Colors.red),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 16),
+                        ElevatedButton(
+                          onPressed: _retryInit,
+                          child: const Text('Retry'),
+                        )
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -93,12 +136,14 @@ class _NewlyGraduateHubState extends State<NewlyGraduateHub> {
         }
 
         return MaterialApp(
+          debugShowCheckedModeBanner: false,
           title: const String.fromEnvironment('APP_NAME', defaultValue: 'Graduate Assistant Hub'),
           theme: ThemeData(
             primarySwatch: Colors.blue,
             visualDensity: VisualDensity.adaptivePlatformDensity,
           ),
-          initialRoute: '/login',
+          // Use home instead of initialRoute to avoid route resolution issues on web
+          home: const LoginScreen(),
           routes: {
             '/login': (context) => const LoginScreen(),
             '/register': (context) => const RegisterScreen(),
