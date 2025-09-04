@@ -34,6 +34,6 @@ flutter pub get
 
 # Build for web
 echo "🔨 Building web app..."
-flutter build web --release --no-tree-shake-icons --web-renderer html
+flutter build web --release --no-tree-shake-icons
 
 echo "✅ Build completed successfully!"
