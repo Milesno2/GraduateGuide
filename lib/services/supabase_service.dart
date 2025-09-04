@@ -231,10 +231,9 @@ class SupabaseService {
       final response = await _supabase
           .from('notifications')
           .select('*')
-          .eq('user_id', userId)
-          .is('read_at', null);
+          .eq('user_id', userId);
 
-      return response.length;
+      return response.where((notification) => notification['read_at'] == null).length;
     } catch (e) {
       print('Get unread notification count error: $e');
       return 0;
