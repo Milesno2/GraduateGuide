@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:newly_graduate_hub/services/supabase_service.dart';
 import 'package:newly_graduate_hub/screens/home_screen.dart';
 import 'package:newly_graduate_hub/screens/login_screen.dart';
@@ -16,9 +15,6 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
   try {
-    // Load environment variables
-    await dotenv.load(fileName: ".env");
-    
     // Initialize Supabase
     await SupabaseService().initialize();
   } catch (e) {
@@ -35,7 +31,7 @@ class NewlyGraduateHub extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: dotenv.env['APP_NAME'] ?? 'Graduate Assistant Hub',
+      title: const String.fromEnvironment('APP_NAME', defaultValue: 'Graduate Assistant Hub'),
       theme: ThemeData(
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,

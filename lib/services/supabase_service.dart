@@ -1,11 +1,12 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter/foundation.dart';
 
 class SupabaseService {
   static late SupabaseClient _supabase;
-  static String get supabaseUrl => dotenv.env['SUPABASE_URL'] ?? 'https://zqcykjxwsnlxmtzcmiga.supabase.co';
-  static String get supabaseAnonKey => dotenv.env['SUPABASE_ANON_KEY'] ?? 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpxY3lranh3c25seG10emNtaWdhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY4NDI4MDgsImV4cCI6MjA3MjQxODgwOH0.dkH258TCMv4q7XXLknfnLNCJu1LVqEGdzabsh-0Oj7s';
+  static String get supabaseUrl => const String.fromEnvironment('SUPABASE_URL', 
+    defaultValue: 'https://zqcykjxwsnlxmtzcmiga.supabase.co');
+  static String get supabaseAnonKey => const String.fromEnvironment('SUPABASE_ANON_KEY', 
+    defaultValue: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpxY3lranh3c25seG10emNtaWdhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY4NDI4MDgsImV4cCI6MjA3MjQxODgwOH0.dkH258TCMv4q7XXLknfnLNCJu1LVqEGdzabsh-0Oj7s');
 
   Future<void> initialize() async {
     try {
