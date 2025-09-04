@@ -96,7 +96,7 @@ class SupabaseService {
     return _supabase
         .from('conversations')
         .stream(primaryKey: ['id'])
-        .eq('participant1_id', userId)
+        .or('participant1_id.eq.$userId,participant2_id.eq.$userId')
         .order('updated_at', ascending: false)
         .map((response) => List<Map<String, dynamic>>.from(response));
   }
@@ -232,7 +232,7 @@ class SupabaseService {
           .from('notifications')
           .select('*')
           .eq('user_id', userId)
-          .is('read_at', null);
+          .is_('read_at', null);
 
       return response.length;
     } catch (e) {
