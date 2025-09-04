@@ -8,7 +8,14 @@ if ! command -v flutter >/dev/null 2>&1; then
   echo "📦 Installing Flutter 3.35.2..."
   git clone https://github.com/flutter/flutter.git -b 3.35.2 flutter-sdk
   export PATH="$PWD/flutter-sdk/bin:$PATH"
+  echo "✅ Flutter installed successfully"
+else
+  echo "✅ Flutter already available"
 fi
+
+# Verify Flutter installation
+echo "🔍 Verifying Flutter installation..."
+flutter --version
 
 # Create .env file
 echo "📝 Creating .env file..."
@@ -30,8 +37,13 @@ flutter clean
 echo "📚 Getting dependencies..."
 flutter pub get
 
+# Verify dependencies
+echo "🔍 Verifying dependencies..."
+flutter pub deps
+
 # Build for web
 echo "🔨 Building web app..."
 flutter build web --release
 
 echo "✅ Build completed successfully!"
+echo "📁 Build output: build/web/"
