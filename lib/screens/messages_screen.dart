@@ -33,8 +33,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: Image.asset('assets/pages_assets/ChevronLeftOutline.png',
-              width: 24, height: 24),
+          icon: Image.asset('assets/pages_assets/ChevronLeftOutline.png', width: 24, height: 24),
           onPressed: () => Navigator.pop(context),
         ),
         centerTitle: true,
@@ -49,8 +48,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 16),
-            child: Image.asset('assets/pages_items/Bell.png',
-                width: 26, height: 26),
+            child: Image.asset('assets/pages_items/Bell.png', width: 26, height: 26),
           ),
         ],
       ),
@@ -60,7 +58,6 @@ class _MessagesScreenState extends State<MessagesScreen> {
             child: ListView.builder(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               itemCount: messages.length,
-              reverse: false,
               itemBuilder: (context, index) {
                 final msg = messages[index];
                 return _buildChatBubble(msg['text'], msg['isMe']);
@@ -77,15 +74,13 @@ class _MessagesScreenState extends State<MessagesScreen> {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
-        mainAxisAlignment:
-            isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
+        mainAxisAlignment: isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           if (!isMe)
-            CircleAvatar(
+            const CircleAvatar(
               radius: 16,
-              backgroundImage:
-                  AssetImage('assets/preloader_assets/charco_education.png'),
+              backgroundImage: AssetImage('assets/preloader_assets/charco_education.png'),
             ),
           if (!isMe) const SizedBox(width: 6),
           Flexible(
@@ -106,19 +101,15 @@ class _MessagesScreenState extends State<MessagesScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
               child: Text(
                 text,
-                style: GoogleFonts.poppins(
-                  fontSize: 14,
-                  color: Colors.black87,
-                ),
+                style: GoogleFonts.poppins(fontSize: 14, color: Colors.black87),
               ),
             ),
           ),
           if (isMe) const SizedBox(width: 6),
           if (isMe)
-            CircleAvatar(
+            const CircleAvatar(
               radius: 16,
-              backgroundImage:
-                  AssetImage('assets/preloader_assets/charco_education.png'),
+              backgroundImage: AssetImage('assets/preloader_assets/charco_education.png'),
             ),
         ],
       ),
@@ -133,11 +124,8 @@ class _MessagesScreenState extends State<MessagesScreen> {
         child: Row(
           children: [
             GestureDetector(
-              onTap: () {
-                // Handle attach action
-              },
-              child: Image.asset('assets/pages_assets/upload_files.png',
-                  width: 24, height: 24),
+              onTap: () {},
+              child: Image.asset('assets/pages_assets/upload_files.png', width: 24, height: 24),
             ),
             const SizedBox(width: 8),
             Expanded(
@@ -145,14 +133,12 @@ class _MessagesScreenState extends State<MessagesScreen> {
                 controller: _controller,
                 decoration: InputDecoration(
                   hintText: 'Type a message',
-                  hintStyle:
-                      GoogleFonts.poppins(color: Colors.grey, fontSize: 15),
+                  hintStyle: GoogleFonts.poppins(color: Colors.grey, fontSize: 15),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide(color: Colors.grey.shade300),
                   ),
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                   filled: true,
                   fillColor: Colors.white,
                 ),
@@ -160,11 +146,8 @@ class _MessagesScreenState extends State<MessagesScreen> {
             ),
             const SizedBox(width: 8),
             GestureDetector(
-              onTap: () {
-                // Handle camera action
-              },
-              child: Image.asset('assets/pages_assets/Camera.png',
-                  width: 24, height: 24),
+              onTap: () {},
+              child: Image.asset('assets/pages_assets/Camera.png', width: 24, height: 24),
             ),
             const SizedBox(width: 8),
             GestureDetector(
@@ -175,8 +158,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                   _controller.clear();
                 });
               },
-              child: Image.asset('assets/pages_assets/sender.png',
-                  width: 24, height: 24),
+              child: Image.asset('assets/pages_assets/sender.png', width: 24, height: 24),
             ),
           ],
         ),

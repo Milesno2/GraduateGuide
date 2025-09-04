@@ -571,7 +571,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             textButtonTheme: TextButtonThemeData(
               style: TextButton.styleFrom(foregroundColor: deepPurple),
             ),
-            dialogTheme: DialogTheme(
+            dialogTheme: DialogThemeData(
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
               ),
@@ -608,21 +608,25 @@ class _RegisterScreenState extends State<RegisterScreen> {
         ? _usernameController.text.trim()
         : '$surname ${_middleNameController.text.trim()}'.trim();
 
-    final ok = await SupabaseService().signUp(
+    final userData = {
+      'full_name': fullName,
+      'phone': '+234${_phoneController.text.trim()}',
+      'gender': 'N/A',
+      'university': 'N/A',
+      'graduation_year': _selectedDob?.year.toString() ?? 'N/A',
+      'course': _selectedProfession ?? 'N/A',
+    };
+
+    final response = await SupabaseService().signUp(
       email: _emailController.text.trim(),
       password: _passwordController.text,
-      name: fullName,
-      phone: '+234${_phoneController.text.trim()}',
-      gender: 'N/A',
-      university: 'N/A', // no school field now
-      graduationYear: _selectedDob?.year.toString() ?? 'N/A',
-      course: _selectedProfession ?? 'N/A',
+      userData: userData,
     );
 
     if (!mounted) return;
     setState(() => _isSubmitting = false);
 
-    if (ok) {
+    if (response.user != null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Registration successful! Please log in.',

@@ -1,476 +1,202 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'screens/skill_screen.dart';
-import 'screens/preloader_screen_1.dart';
-import 'screens/preloader_screen_2.dart';
-import 'screens/preloader_screen_3.dart';
-import 'screens/preloader_screen_4.dart';
-import 'screens/onboarding_screen.dart';
-import 'screens/login_screen.dart';
-import 'screens/register_screen.dart';
-import 'screens/home_screen.dart';
-import 'screens/customer_care_screen.dart';
-import 'screens/messages_screen.dart';
-import 'screens/resume_builder_screen.dart';
-import 'screens/updates_screen.dart';
-import 'screens/user_screen.dart';
-import 'services/supabase_service.dart';
+import 'package:newly_graduate_hub/services/supabase_service.dart';
+import 'package:newly_graduate_hub/screens/home_screen.dart';
+import 'package:newly_graduate_hub/screens/login_screen.dart';
+import 'package:newly_graduate_hub/screens/register_screen.dart';
+import 'package:newly_graduate_hub/screens/messages_screen.dart';
+import 'package:newly_graduate_hub/screens/user_screen.dart';
+import 'package:newly_graduate_hub/screens/skills_screen.dart';
+import 'package:newly_graduate_hub/screens/masters_screen.dart';
+import 'package:newly_graduate_hub/screens/jobs_screen.dart';
+import 'package:newly_graduate_hub/screens/career_assistant_screen.dart';
+import 'package:newly_graduate_hub/screens/nyscguidelines_screen.dart';
+import 'package:newly_graduate_hub/screens/onboarding_screen.dart';
+import 'package:newly_graduate_hub/screens/preloader_screen_1.dart';
+import 'package:newly_graduate_hub/utils/log_console.dart';
+import 'package:newly_graduate_hub/screens/updates_screen.dart';
+import 'package:newly_graduate_hub/screens/skills_landing_screen.dart';
+import 'package:newly_graduate_hub/screens/skill1.dart';
+import 'package:newly_graduate_hub/screens/skill2.dart';
+import 'package:newly_graduate_hub/screens/skill3.dart';
+import 'package:newly_graduate_hub/screens/resume_builder_screen.dart';
 
-void main() async {
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  await SupabaseService().initialize();
-  runApp(const NewlyGraduateHub());
+
+  final log = LogConsoleService();
+  debugPrint = (String? message, {int? wrapWidth}) {
+    if (message != null) log.add(message);
+    // Also forward to default stdout
+    // ignore: avoid_print
+    print(message);
+  };
+
+  FlutterError.onError = (FlutterErrorDetails details) {
+    log.add('[FlutterError] ${details.exceptionAsString()}');
+    FlutterError.presentError(details);
+  };
+
+  runZonedGuarded(() {
+    runApp(const NewlyGraduateHub());
+  }, (error, stack) {
+    log.add('[ZoneError] $error');
+  });
 }
 
-class NewlyGraduateHub extends StatelessWidget {
+class NewlyGraduateHub extends StatefulWidget {
   const NewlyGraduateHub({super.key});
 
   @override
+  State<NewlyGraduateHub> createState() => _NewlyGraduateHubState();
+}
+
+class _NewlyGraduateHubState extends State<NewlyGraduateHub> {
+  late Future<void> _initFuture = _initialize();
+  Object? _initError;
+
+  Future<void> _initialize() async {
+    try {
+      LogConsoleService().add('Initializing Supabase...');
+      await SupabaseService().initialize();
+      LogConsoleService().add('Supabase initialized');
+    } catch (e) {
+      _initError = e;
+      LogConsoleService().add('Init error: $e');
+      rethrow;
+    }
+  }
+
+  void _retryInit() {
+    setState(() {
+      _initError = null;
+      _initFuture = _initialize();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Newly Graduate Hub',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.purple,
-          primary: Colors.purple.shade800,
-        ),
-        useMaterial3: true,
-        textTheme: GoogleFonts.poppinsTextTheme(),
-        inputDecorationTheme: InputDecorationTheme(
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: Colors.purple.shade200),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: Colors.purple.shade600, width: 2),
-          ),
-        ),
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
-            elevation: 2,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
+    return FutureBuilder<void>(
+      future: _initFuture,
+      builder: (context, snapshot) {
+        Widget child;
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          child = const _SplashScreen(title: 'Loading...');
+        } else if (snapshot.hasError) {
+          final message = (_initError ?? snapshot.error).toString();
+          child = Scaffold(
+            appBar: AppBar(title: const Text('Initialization Error')),
+            body: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 700),
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Text(
+                        'The app failed to start. Please check configuration.',
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        message,
+                        style: const TextStyle(color: Colors.red),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 16),
+                      ElevatedButton(onPressed: _retryInit, child: const Text('Retry')),
+                    ],
+                  ),
+                ),
+              ),
             ),
+          );
+        } else {
+          child = const OnboardingScreen();
+        }
+
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: const String.fromEnvironment('APP_NAME', defaultValue: 'Graduate Assistant Hub'),
+          theme: ThemeData(
+            primarySwatch: Colors.blue,
+            visualDensity: VisualDensity.adaptivePlatformDensity,
           ),
-        ),
-      ),
-      initialRoute: '/onboarding',
-      routes: {
-        '/onboarding': (context) => const OnboardingScreen(),
-        '/login': (context) => const LoginScreen(),
-        '/register': (context) => const RegisterScreen(),
-        '/home': (context) => const HomeScreen(),
-        '/customer-care': (context) => const CustomerCareScreen(),
-        '/messages': (context) => const MessagesScreen(),
-        '/resume-builder': (context) => const ResumeBuilderScreen(),
-        '/updates': (context) => const UpdatesScreen(),
-        '/skills': (context) => const SkillsScreen(),
-        '/jobs': (context) => const JobsScreen(),
-        '/skill-progress': (context) => const SkillProgressScreen(),
-        '/tasks': (context) => const TasksScreen(),
-        '/masters-update': (context) => const MastersUpdateScreen(),
-        '/me': (context) => const UserScreen(),
-        '/post': (context) => const PostScreen(),
+          home: Stack(
+            children: [
+              child,
+              const Positioned.fill(child: IgnorePointer(ignoring: true, child: SizedBox.shrink())),
+              const LogConsoleOverlay(),
+            ],
+          ),
+          routes: {
+            '/login': (context) => const LoginScreen(),
+            '/register': (context) => const RegisterScreen(),
+            '/home': (context) => const HomeScreen(),
+            '/messages': (context) => const MessagesScreen(),
+            '/user': (context) => const UserScreen(),
+            '/skills': (context) => const SkillsLandingScreen(),
+            '/skill1': (context) => const Skill1Screen(),
+            '/skill2': (context) => const Skill2Screen(),
+            '/skill3': (context) => const Skill3Screen(),
+            '/masters': (context) => const MastersScreen(),
+            '/jobs': (context) => const JobsScreen(),
+            '/career-assistant': (context) => const CareerAssistantScreen(),
+            '/nysc-guidelines': (context) => const NYSCGuidelinesScreen(),
+            '/onboarding': (context) => const OnboardingScreen(),
+            '/preload-1': (context) => const PreloaderScreen1(),
+            '/updates': (context) => const UpdatesScreen(),
+            '/resume-builder': (context) => const ResumeBuilderScreen(),
+          },
+        );
       },
     );
   }
 }
 
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+class RootRouter extends StatefulWidget {
+  const RootRouter({super.key});
 
-  final Color deepPurple = const Color(0xFF6C2786);
+  @override
+  State<RootRouter> createState() => _RootRouterState();
+}
 
-  Future<void> _openExternal(BuildContext context, String url) async {
-    final uri = Uri.parse(url);
-    final leave = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text('Leave Graduate Guide?',
-            style: GoogleFonts.poppins(fontWeight: FontWeight.bold)),
-        content: Text(
-            'You are about to leave the Graduate Guide app and visit an external website. Continue?',
-            style: GoogleFonts.poppins()),
-        actions: [
-          TextButton(
-            child:
-                Text('Cancel', style: GoogleFonts.poppins(color: Colors.grey)),
-            onPressed: () => Navigator.pop(ctx, false),
-          ),
-          TextButton(
-            child:
-                Text('Continue', style: GoogleFonts.poppins(color: deepPurple)),
-            onPressed: () => Navigator.pop(ctx, true),
-          ),
-        ],
-      ),
-    );
-    if (leave == true) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-    }
-  }
-
-  Widget _buildGridItem(String asset, String label) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Container(
-          width: 80,
-          height: 80,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withOpacity(0.12),
-                blurRadius: 8,
-                spreadRadius: 1,
-              ),
-            ],
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: Image.asset(asset, fit: BoxFit.contain),
-          ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          label,
-          style: GoogleFonts.poppins(
-            fontSize: 13,
-            fontWeight: FontWeight.w500,
-          ),
-          textAlign: TextAlign.center,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildArrowItem() {
-    return Center(
-      child: Container(
-        width: 80,
-        height: 80,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.12),
-              blurRadius: 8,
-              spreadRadius: 1,
-            ),
-          ],
-        ),
-        child:
-            const Icon(Icons.arrow_forward_ios, size: 32, color: Colors.grey),
-      ),
-    );
+class _RootRouterState extends State<RootRouter> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      LogConsoleService().add('Routing to onboarding...');
+      if (!mounted) return;
+      Navigator.of(context).pushReplacementNamed('/onboarding');
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 24),
-              decoration: BoxDecoration(
-                color: deepPurple,
-                borderRadius: const BorderRadius.only(
-                  bottomLeft: Radius.circular(32),
-                  bottomRight: Radius.circular(32),
-                ),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      CircleAvatar(
-                        radius: 22,
-                        backgroundImage:
-                            AssetImage('assets/pages_assets/profile.png'),
-                      ),
-                      const SizedBox(width: 12),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Welcome back',
-                              style: GoogleFonts.poppins(
-                                  color: Colors.white, fontSize: 13)),
-                          Text('DADA TIMILEHIN S.',
-                              style: GoogleFonts.poppins(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 15)),
-                        ],
-                      ),
-                      const Spacer(),
-                      Image.asset(
-                        'assets/pages_assets/support.png',
-                        width: 28,
-                        height: 28,
-                        fit: BoxFit.contain,
-                      ),
-                      const SizedBox(width: 16),
-                      Image.asset(
-                        'assets/pages_items/Bell.png',
-                        width: 28,
-                        height: 28,
-                        fit: BoxFit.contain,
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 32),
-                  Center(
-                    child: Text(
-                      'Graduate Guide',
-                      style: GoogleFonts.poppins(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 28,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 24),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: GridView.count(
-                crossAxisCount: 3,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                childAspectRatio: 0.95,
-                children: [
-                  GestureDetector(
-                    onTap: () => _openExternal(
-                        context, 'https://portal.nysc.org.ng/nysc1/'),
-                    child: _buildGridItem('assets/pages_items/nysc_logo.png',
-                        'Nysc Reg.\nGuidelines'),
-                  ),
-                  GestureDetector(
-                    onTap: () =>
-                        Navigator.pushNamed(context, '/resume-builder'),
-                    child: _buildGridItem(
-                        'assets/pages_items/resume.png', 'Resume Builder'),
-                  ),
-                  GestureDetector(
-                    onTap: () => Navigator.pushNamed(context, '/skills'),
-                    child: _buildGridItem(
-                        'assets/pages_items/task.png', 'Acquire Skill'),
-                  ),
-                  GestureDetector(
-                    onTap: () =>
-                        Navigator.pushNamed(context, '/masters-update'),
-                    child: _buildGridItem(
-                        'assets/pages_items/masters.png', 'Masters Update'),
-                  ),
-                  GestureDetector(
-                    onTap: () => Navigator.pushNamed(context, '/jobs'),
-                    child: _buildGridItem(
-                        'assets/pages_items/job.png', 'Job Offer'),
-                  ),
-                  _buildArrowItem(),
-                ],
-              ),
-            ),
-            const SizedBox(height: 32),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Row(
-                children: [
-                  Text('Campus News',
-                      style: GoogleFonts.poppins(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                          color: deepPurple)),
-                  const Spacer(),
-                  TextButton(
-                    onPressed: () {},
-                    child: Text('See all >',
-                        style: GoogleFonts.poppins(color: deepPurple)),
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Card(
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12)),
-                child: ListTile(
-                  leading: Image.asset('assets/pages_items/fmn_logo.png',
-                      width: 48, height: 48, fit: BoxFit.contain),
-                  title: Text(
-                      'Lautech Student Emerge as the best in the FMN Competition',
-                      style: GoogleFonts.poppins(
-                          fontWeight: FontWeight.w500, fontSize: 14)),
-                  subtitle: Text('Posted 30 min ago',
-                      style: GoogleFonts.poppins(
-                          fontSize: 12, color: Colors.grey[600])),
-                ),
-              ),
-            ),
-            const SizedBox(height: 24),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('NYSC Quick Links',
-                      style: GoogleFonts.poppins(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                          color: deepPurple)),
-                  const SizedBox(height: 12),
-                  ListTile(
-                    leading: Image.asset('assets/pages_items/nysc_logo.png',
-                        width: 36, height: 36),
-                    title: Text('NYSC Official Portal',
-                        style:
-                            GoogleFonts.poppins(fontWeight: FontWeight.w600)),
-                    subtitle: Text('Registration, guidelines, and updates.',
-                        style: GoogleFonts.poppins(fontSize: 13)),
-                    trailing:
-                        const Icon(Icons.open_in_new, color: Colors.green),
-                    onTap: () => _openExternal(
-                        context, 'https://portal.nysc.org.ng/nysc1/'),
-                  ),
-                  ListTile(
-                    leading:
-                        const Icon(Icons.info_outline, color: Colors.orange),
-                    title: Text('NYSC Requirements',
-                        style:
-                            GoogleFonts.poppins(fontWeight: FontWeight.w600)),
-                    subtitle: Text(
-                        'Eligibility, documents, and step-by-step process.',
-                        style: GoogleFonts.poppins(fontSize: 13)),
-                    trailing:
-                        const Icon(Icons.open_in_new, color: Colors.orange),
-                    onTap: () =>
-                        _openExternal(context, 'https://www.nysc.gov.ng/'),
-                  ),
-                  ListTile(
-                    leading: Icon(Icons.school, color: deepPurple),
-                    title: Text(
-                      'NYSC Orientation Camp Tips',
-                      style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
-                    ),
-                    subtitle: Text(
-                      'Advice for a successful camp experience.',
-                      style: GoogleFonts.poppins(fontSize: 13),
-                    ),
-                    trailing: Icon(Icons.open_in_new, color: deepPurple),
-                    onTap: () => _openExternal(
-                      context,
-                      'https://www.nysc.gov.ng/orientation-camp.html',
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 32),
-          ],
-        ),
-      ),
-      bottomNavigationBar: _buildBottomNavBar(context, deepPurple),
-    );
-  }
-
-  Widget _buildBottomNavBar(BuildContext context, Color deepPurple) {
-    return Container(
-      decoration: BoxDecoration(color: Colors.white, boxShadow: [
-        BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, -2))
-      ]),
-      child: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: deepPurple,
-        unselectedItemColor: Colors.grey,
-        currentIndex: 0,
-        items: [
-          BottomNavigationBarItem(
-              icon: Image.asset('assets/pages_assets/Home (1).png',
-                  width: 22, height: 22),
-              label: 'Home'),
-          BottomNavigationBarItem(
-              icon: Image.asset('assets/pages_assets/Annotation.png',
-                  width: 22, height: 22),
-              label: 'Messages'),
-          BottomNavigationBarItem(
-              icon: Image.asset('assets/pages_assets/Speakerphone.png',
-                  width: 22, height: 22),
-              label: 'Updates'),
-          BottomNavigationBarItem(
-              icon: Image.asset('assets/pages_assets/UserCircle.png',
-                  width: 22, height: 22),
-              label: 'Me'),
-        ],
-        onTap: (index) {
-          switch (index) {
-            case 0:
-              break;
-            case 1:
-              Navigator.pushNamed(context, '/messages');
-              break;
-            case 2:
-              Navigator.pushNamed(context, '/updates');
-              break;
-            case 3:
-              Navigator.pushNamed(context, '/me');
-              break;
-          }
-        },
-      ),
-    );
+    return const _SplashScreen(title: 'Starting...');
   }
 }
 
-class SkillsScreen extends StatelessWidget {
-  const SkillsScreen({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('Skills', style: GoogleFonts.poppins())),
-      body: Center(child: Text('Skills Screen', style: GoogleFonts.poppins())),
-    );
-  }
-}
+class _SplashScreen extends StatelessWidget {
+  final String title;
+  const _SplashScreen({required this.title});
 
-class JobsScreen extends StatelessWidget {
-  const JobsScreen({super.key});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Jobs', style: GoogleFonts.poppins())),
-      body: Center(child: Text('Jobs Screen', style: GoogleFonts.poppins())),
-    );
-  }
-}
-
-class SkillProgressScreen extends StatelessWidget {
-  const SkillProgressScreen({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar:
-          AppBar(title: Text('Skill Progress', style: GoogleFonts.poppins())),
       body: Center(
-          child: Text('Skill Progress Screen', style: GoogleFonts.poppins())),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(width: 42, height: 42, child: CircularProgressIndicator()),
+            const SizedBox(height: 12),
+            Text(title),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -480,21 +206,8 @@ class TasksScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Tasks', style: GoogleFonts.poppins())),
-      body: Center(child: Text('Tasks Screen', style: GoogleFonts.poppins())),
-    );
-  }
-}
-
-class MastersUpdateScreen extends StatelessWidget {
-  const MastersUpdateScreen({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar:
-          AppBar(title: Text('Masters Update', style: GoogleFonts.poppins())),
-      body: Center(
-          child: Text('Masters Update Screen', style: GoogleFonts.poppins())),
+      appBar: AppBar(title: const Text('Tasks')),
+      body: const Center(child: Text('Tasks Screen - Coming Soon')),
     );
   }
 }
@@ -504,8 +217,8 @@ class PostScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Post', style: GoogleFonts.poppins())),
-      body: Center(child: Text('Post Screen', style: GoogleFonts.poppins())),
+      appBar: AppBar(title: const Text('Post')),
+      body: const Center(child: Text('Post Screen - Coming Soon')),
     );
   }
 }

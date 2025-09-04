@@ -1,82 +1,36 @@
 name: newly_graduate_hub
-description: A comprehensive mobile app for newly graduated students to build their careers.
-publish_to: "none"
+description: "A comprehensive mobile app for newly graduated students to build their careers."
+publish_to: 'none'
 
 version: 1.0.0+1
 
 environment:
-  sdk: ">=3.0.0 <4.0.0"
+  sdk: '>=3.5.4 <4.0.0'
 
 dependencies:
   flutter:
     sdk: flutter
-  supabase_flutter: ^2.8.4
-  http: ^1.1.0
-  cached_network_image: ^3.3.0
-  flutter_svg: ^2.0.9
-  lottie: ^3.3.1
-  flutter_animate: ^4.2.0+1
+  cupertino_icons: ^1.0.2
+  supabase_flutter: ^2.3.4
   google_fonts: ^6.3.0
   image_picker: ^1.0.4
   url_launcher: ^6.2.1
-
-  cupertino_icons: ^1.0.2
+  lottie: ^3.2.0
+  flutter_animate: ^4.2.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^5.0.0
+  flutter_lints: ^3.0.0
+
+dependency_overrides:
+  lottie: ^3.2.0
 
 flutter:
+  uses-material-design: true
+  
   assets:
-    - assets/preloader_assets/charco_education.png
-    - assets/preloader_assets/fresh_folk_teaching.png
-    - assets/preloader_assets/happy_bunch_chat.png
-    - assets/preloader_assets/ola_playing_video_games.png
-    - assets/pages_items/register.png
-    - assets/pages_items/register_gradient.png
-    - assets/pages_items/nysc_logo.png
-    - assets/pages_items/resume.png
-    - assets/pages_items/fmn_logo.png
-    - assets/pages_items/task.png
-    - assets/pages_assets/profile.png
-    - assets/pages_items/Bell.png
-    - assets/pages_items/nigeria_flag.png
-    - assets/pages_items/support.png
-    - assets/pages_items/skill1.png
-    - assets/pages_items/skill2.png
-    - assets/pages_items/skill3.png
-    - assets/pages_items/masters.png
-    - assets/pages_items/job.png
-    # Include the entire design assets folder (handles spaces/parentheses nicely)
-    - assets/pages_assets/Annotation.png
-    - assets/pages_assets/Bell.png
-    - assets/pages_assets/Login.png
-    - assets/pages_assets/sender.png
-    - assets/pages_assets/Camera.png
-    - assets/pages_assets/upload_files.png
-    - assets/pages_assets/ChevronLeftOutline.png
-
-    - assets/pages_assets/Customer care (1).png
-    - assets/pages_assets/customer_care.png
-    - assets/pages_assets/Ellipse 1.png
-    - assets/pages_assets/Ellipse 2.png
-    - assets/pages_assets/Fresh Folk Teaching.png
-    - assets/pages_assets/Home (1).png
-    - assets/pages_assets/job.png
-    - assets/pages_assets/login (1).png
-    - assets/pages_assets/masters.png
-    - assets/pages_assets/Me.png
-    - assets/pages_assets/Messages.png
-    - assets/pages_assets/nysc_logo.png
-    - assets/pages_assets/register_gradient.png
-    - assets/pages_assets/register.png
-    - assets/pages_assets/resume.png
-    - assets/pages_assets/skill2.png
-    - assets/pages_assets/skill3.png
-    - assets/pages_assets/avatar.png
-    - assets/pages_assets/support.png
-    - assets/pages_assets/Skills.png
-    - assets/pages_assets/Speakerphone.png
-    - assets/pages_assets/UserCircle.png
-    - assets/pages_assets/updates.png
+    - assets/
+    - assets/pages_assets/
+    - assets/pages_items/
+    - assets/preloader_assets/

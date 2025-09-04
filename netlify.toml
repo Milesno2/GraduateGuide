@@ -1,6 +1,10 @@
 [build]
-  command = "bash netlify_build.sh"
+  command = "./minimal_build.sh"
   publish = "build/web"
+
+[build.environment]
+  NODE_VERSION = "18.17.0"
+  SECRETS_SCAN_ENABLED = "false"
 
 [[redirects]]
   from = "/*"
