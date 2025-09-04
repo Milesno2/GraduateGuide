@@ -13,15 +13,38 @@ import 'package:newly_graduate_hub/screens/nyscguidelines_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
+  // Global error reporting to avoid blank screens
+  FlutterError.onError = (FlutterErrorDetails details) {
+    debugPrint('FlutterError: \n${details.exceptionAsString()}');
+    FlutterError.presentError(details);
+  };
+
+  ErrorWidget.builder = (FlutterErrorDetails details) {
+    return MaterialApp(
+      home: Scaffold(
+        backgroundColor: Colors.white,
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Text(
+              'A runtime error occurred. Please check the console logs.\n\n${details.exceptionAsString()}',
+              style: const TextStyle(color: Colors.red),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ),
+      ),
+    );
+  };
+
   try {
     // Initialize Supabase
     await SupabaseService().initialize();
   } catch (e) {
-    print('Initialization error: $e');
-    // Continue with default values
+    debugPrint('Initialization error: $e');
   }
-  
+
   runApp(const NewlyGraduateHub());
 }
 
