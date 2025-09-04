@@ -81,18 +81,7 @@ class _NewlyGraduateHubState extends State<NewlyGraduateHub> {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return MaterialApp(
             debugShowCheckedModeBanner: false,
-            home: Scaffold(
-              body: Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: const [
-                    CircularProgressIndicator(),
-                    SizedBox(height: 12),
-                    Text('Loading...')
-                  ],
-                ),
-              ),
-            ),
+            home: const _SplashScreen(title: 'Loading...'),
           );
         }
 
@@ -142,8 +131,7 @@ class _NewlyGraduateHubState extends State<NewlyGraduateHub> {
             primarySwatch: Colors.blue,
             visualDensity: VisualDensity.adaptivePlatformDensity,
           ),
-          // Use home instead of initialRoute to avoid route resolution issues on web
-          home: const LoginScreen(),
+          home: const RootRouter(),
           routes: {
             '/login': (context) => const LoginScreen(),
             '/register': (context) => const RegisterScreen(),
@@ -160,6 +148,57 @@ class _NewlyGraduateHubState extends State<NewlyGraduateHub> {
           },
         );
       },
+    );
+  }
+}
+
+class RootRouter extends StatefulWidget {
+  const RootRouter({super.key});
+
+  @override
+  State<RootRouter> createState() => _RootRouterState();
+}
+
+class _RootRouterState extends State<RootRouter> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      // Determine destination: if logged-in -> Home; else -> Login
+      final user = SupabaseService().client.auth.currentUser;
+      final destination = user == null ? '/login' : '/home';
+      if (!mounted) return;
+      Navigator.of(context).pushReplacementNamed(destination);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return const _SplashScreen(title: 'Starting...');
+  }
+}
+
+class _SplashScreen extends StatelessWidget {
+  final String title;
+  const _SplashScreen({required this.title});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(
+              width: 42,
+              height: 42,
+              child: CircularProgressIndicator(),
+            ),
+            const SizedBox(height: 12),
+            Text(title),
+          ],
+        ),
+      ),
     );
   }
 }
