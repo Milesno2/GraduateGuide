@@ -3,6 +3,12 @@ set -euo pipefail
 
 echo "🚀 Starting Flutter web build for Netlify..."
 
+# Check if Node.js is available
+if ! command -v node >/dev/null 2>&1; then
+  echo "📦 Node.js not found, using system Node.js..."
+  # Netlify should provide Node.js automatically
+fi
+
 # Install or reuse Flutter SDK
 if ! command -v flutter >/dev/null 2>&1; then
   if [ -d flutter-sdk ]; then
