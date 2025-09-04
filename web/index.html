@@ -23,7 +23,7 @@
   <style>
     html, body { height: 100%; }
     body { margin: 0; font-family: Arial, Helvetica, sans-serif; }
-    #fallback-loader { display:flex; height:100%; align-items:center; justify-content:center; }
+    #fallback-loader { display:flex; height:100%; align-items:center; justify-content:center; padding: 16px; text-align: center; }
   </style>
 </head>
 <body>
@@ -31,22 +31,28 @@
   <div id="fallback-loader">Loading app…</div>
   <script>
     window.addEventListener('load', function() {
-      if (!('_flutter' in window) || !window._flutter.loader) {
-        document.getElementById('fallback-loader').textContent = 'Failed to load Flutter loader.';
-        return;
-      }
-      window._flutter.loader.load({
-        serviceWorker: { serviceWorkerVersion: serviceWorkerVersion }
-      }).then(function(engineInitializer) {
-        return engineInitializer.initializeEngine();
-      }).then(function(appRunner) {
-        document.getElementById('fallback-loader').style.display = 'none';
-        return appRunner.runApp();
-      }).catch(function(err) {
+      function showError(err) {
         console.error('Flutter boot error:', err);
         var el = document.getElementById('fallback-loader');
         el.textContent = 'Startup error: ' + (err && (err.message || err.toString()));
-      });
+      }
+      if (!('_flutter' in window) || !window._flutter.loader) {
+        showError('Failed to load Flutter loader.');
+        return;
+      }
+      try {
+        window._flutter.loader.loadEntrypoint({
+          serviceWorker: { serviceWorkerVersion: serviceWorkerVersion },
+          onEntrypointLoaded: function(engineInitializer) {
+            engineInitializer.initializeEngine().then(function(appRunner) {
+              document.getElementById('fallback-loader').style.display = 'none';
+              return appRunner.runApp();
+            }).catch(showError);
+          }
+        });
+      } catch (e) {
+        showError(e);
+      }
     });
   </script>
 </body>
