@@ -14,6 +14,11 @@ import 'package:newly_graduate_hub/screens/nyscguidelines_screen.dart';
 import 'package:newly_graduate_hub/screens/onboarding_screen.dart';
 import 'package:newly_graduate_hub/screens/preloader_screen_1.dart';
 import 'package:newly_graduate_hub/utils/log_console.dart';
+import 'package:newly_graduate_hub/screens/updates_screen.dart';
+import 'package:newly_graduate_hub/screens/skills_landing_screen.dart';
+import 'package:newly_graduate_hub/screens/skill1.dart';
+import 'package:newly_graduate_hub/screens/skill2.dart';
+import 'package:newly_graduate_hub/screens/skill3.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -131,13 +136,17 @@ class _NewlyGraduateHubState extends State<NewlyGraduateHub> {
             '/home': (context) => const HomeScreen(),
             '/messages': (context) => const MessagesScreen(),
             '/user': (context) => const UserScreen(),
-            '/skills': (context) => const SkillsScreen(),
+            '/skills': (context) => const SkillsLandingScreen(),
+            '/skill1': (context) => const Skill1Screen(),
+            '/skill2': (context) => const Skill2Screen(),
+            '/skill3': (context) => const Skill3Screen(),
             '/masters': (context) => const MastersScreen(),
             '/jobs': (context) => const JobsScreen(),
             '/career-assistant': (context) => const CareerAssistantScreen(),
             '/nysc-guidelines': (context) => const NYSCGuidelinesScreen(),
             '/onboarding': (context) => const OnboardingScreen(),
             '/preload-1': (context) => const PreloaderScreen1(),
+            '/updates': (context) => const UpdatesScreen(),
           },
         );
       },
