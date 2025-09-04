@@ -1,8 +1,18 @@
 [build]
-  command = "bash netlify_build.sh"
+  command = "chmod +x netlify_build.sh && ./netlify_build.sh"
   publish = "build/web"
+  functions = "netlify/functions"
+
+[build.environment]
+  FLUTTER_VERSION = "3.19.0"
+  NODE_VERSION = "18"
 
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
+
+[dev]
+  command = "flutter run -d web-server --web-port 8888"
+  port = 8888
+  publish = "build/web"

@@ -50,6 +50,8 @@ class _SkillProgressScreenState extends State<SkillProgressScreen> {
           'completed_lessons': 15,
           'total_lessons': 20,
           'last_activity': DateTime.now().subtract(const Duration(days: 2)),
+          'certificate_earned': false,
+          'next_milestone': 'Complete Advanced Flutter Concepts',
         },
         {
           'id': '2',
@@ -63,6 +65,8 @@ class _SkillProgressScreenState extends State<SkillProgressScreen> {
           'completed_lessons': 9,
           'total_lessons': 20,
           'last_activity': DateTime.now().subtract(const Duration(days: 5)),
+          'certificate_earned': false,
+          'next_milestone': 'Complete Design Fundamentals',
         },
         {
           'id': '3',
@@ -76,6 +80,8 @@ class _SkillProgressScreenState extends State<SkillProgressScreen> {
           'completed_lessons': 18,
           'total_lessons': 20,
           'last_activity': DateTime.now().subtract(const Duration(hours: 6)),
+          'certificate_earned': true,
+          'next_milestone': 'Earn Advanced Certification',
         },
         {
           'id': '4',
@@ -89,6 +95,8 @@ class _SkillProgressScreenState extends State<SkillProgressScreen> {
           'completed_lessons': 12,
           'total_lessons': 20,
           'last_activity': DateTime.now().subtract(const Duration(days: 1)),
+          'certificate_earned': false,
+          'next_milestone': 'Complete PMP Preparation',
         },
         {
           'id': '5',
@@ -102,6 +110,8 @@ class _SkillProgressScreenState extends State<SkillProgressScreen> {
           'completed_lessons': 6,
           'total_lessons': 20,
           'last_activity': DateTime.now().subtract(const Duration(days: 7)),
+          'certificate_earned': false,
+          'next_milestone': 'Complete Basic Marketing Course',
         },
       ];
       _isLoading = false;
@@ -132,28 +142,44 @@ class _SkillProgressScreenState extends State<SkillProgressScreen> {
     final progress = skill['progress'] as int;
     final progressColor = _getProgressColor(progress);
     
-    return Card(
-      margin: const EdgeInsets.only(bottom: 16),
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
+    return Container(
+      margin: const EdgeInsets.only(bottom: 20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          // Header with skill info
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: skill['color'].withOpacity(0.05),
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(16),
+                topRight: Radius.circular(16),
+              ),
+            ),
+            child: Row(
               children: [
                 Container(
-                  width: 50,
-                  height: 50,
+                  width: 60,
+                  height: 60,
                   decoration: BoxDecoration(
                     color: skill['color'].withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(16),
                   ),
                   child: Icon(
                     skill['icon'],
                     color: skill['color'],
-                    size: 24,
+                    size: 28,
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -161,19 +187,42 @@ class _SkillProgressScreenState extends State<SkillProgressScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        skill['name'],
-                        style: GoogleFonts.poppins(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              skill['name'],
+                              style: GoogleFonts.poppins(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                              ),
+                            ),
+                          ),
+                          if (skill['certificate_earned'])
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: Colors.green,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Text(
+                                'CERTIFIED',
+                                style: GoogleFonts.poppins(
+                                  fontSize: 10,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                        ],
                       ),
                       const SizedBox(height: 4),
                       Text(
                         skill['category'],
                         style: GoogleFonts.poppins(
-                          fontSize: 12,
-                          color: Colors.grey[600],
+                          fontSize: 14,
+                          color: skill['color'],
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -187,7 +236,7 @@ class _SkillProgressScreenState extends State<SkillProgressScreen> {
                         child: Text(
                           skill['level'],
                           style: GoogleFonts.poppins(
-                            fontSize: 10,
+                            fontSize: 12,
                             fontWeight: FontWeight.w500,
                             color: skill['color'],
                           ),
@@ -196,353 +245,184 @@ class _SkillProgressScreenState extends State<SkillProgressScreen> {
                     ],
                   ),
                 ),
-                IconButton(
-                  onPressed: () => _showSkillDetails(skill),
-                  icon: Icon(Icons.more_vert, color: Colors.grey[600]),
-                ),
               ],
             ),
-            const SizedBox(height: 16),
-            Text(
-              skill['description'],
-              style: GoogleFonts.poppins(
-                fontSize: 14,
-                color: Colors.grey[700],
-              ),
-            ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Progress',
-                        style: GoogleFonts.poppins(
-                          fontSize: 12,
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        '$progress%',
-                        style: GoogleFonts.poppins(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                          color: progressColor,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Lessons',
-                        style: GoogleFonts.poppins(
-                          fontSize: 12,
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        '${skill['completed_lessons']}/${skill['total_lessons']}',
-                        style: GoogleFonts.poppins(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                          color: deepPurple,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Last Activity',
-                        style: GoogleFonts.poppins(
-                          fontSize: 12,
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        _getTimeAgo(skill['last_activity']),
-                        style: GoogleFonts.poppins(
-                          fontSize: 12,
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            LinearProgressIndicator(
-              value: progress / 100,
-              backgroundColor: Colors.grey[200],
-              valueColor: AlwaysStoppedAnimation<Color>(progressColor),
-              minHeight: 8,
-            ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () => _continueLearning(skill),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: deepPurple,
-                      side: BorderSide(color: deepPurple),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    child: Text(
-                      'Continue',
-                      style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () => _takeAssessment(skill),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: deepPurple,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    child: Text(
-                      'Assessment',
-                      style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _showSkillDetails(Map<String, dynamic> skill) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        height: MediaQuery.of(context).size.height * 0.7,
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(20),
-            topRight: Radius.circular(20),
           ),
-        ),
-        child: Column(
-          children: [
-            Container(
-              width: 40,
-              height: 4,
-              margin: const EdgeInsets.symmetric(vertical: 12),
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(20),
-                child: Column(
+          
+          // Progress section
+          Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  skill['description'],
+                  style: GoogleFonts.poppins(
+                    fontSize: 14,
+                    color: Colors.grey[700],
+                  ),
+                ),
+                const SizedBox(height: 20),
+                
+                // Progress stats
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildProgressStat('Progress', '$progress%', progressColor),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: _buildProgressStat('Lessons', '${skill['completed_lessons']}/${skill['total_lessons']}', deepPurple),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: _buildProgressStat('Last Activity', _getTimeAgo(skill['last_activity']), Colors.grey[600]!),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                
+                // Progress bar
+                Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Container(
-                          width: 60,
-                          height: 60,
-                          decoration: BoxDecoration(
-                            color: skill['color'].withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Icon(
-                            skill['icon'],
-                            color: skill['color'],
-                            size: 30,
+                        Text(
+                          'Course Progress',
+                          style: GoogleFonts.poppins(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14,
+                            color: deepPurple,
                           ),
                         ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                skill['name'],
-                                style: GoogleFonts.poppins(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 18,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                skill['category'],
-                                style: GoogleFonts.poppins(
-                                  fontSize: 14,
-                                  color: Colors.grey[600],
-                                ),
-                              ),
-                            ],
+                        Text(
+                          '$progress%',
+                          style: GoogleFonts.poppins(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            color: progressColor,
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 24),
-                    Text(
-                      'Progress Overview',
-                      style: GoogleFonts.poppins(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
+                    const SizedBox(height: 8),
+                    LinearProgressIndicator(
+                      value: progress / 100,
+                      backgroundColor: Colors.grey[200],
+                      valueColor: AlwaysStoppedAnimation<Color>(progressColor),
+                      minHeight: 10,
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                
+                // Next milestone
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.amber.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.amber.withOpacity(0.3)),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.lightbulb, color: Colors.amber[700], size: 20),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Next Milestone',
+                              style: GoogleFonts.poppins(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 12,
+                                color: Colors.amber[700],
+                              ),
+                            ),
+                            Text(
+                              skill['next_milestone'],
+                              style: GoogleFonts.poppins(
+                                fontSize: 13,
+                                color: Colors.grey[700],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20),
+                
+                // Action buttons
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () => _continueLearning(skill),
+                        icon: Icon(Icons.play_arrow, size: 16),
+                        label: Text('Continue', style: GoogleFonts.poppins(fontSize: 12)),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: deepPurple,
+                          side: BorderSide(color: deepPurple),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
                       ),
                     ),
-                    const SizedBox(height: 16),
-                    _buildProgressItem('Current Level', skill['level']),
-                    _buildProgressItem('Progress', '${skill['progress']}%'),
-                    _buildProgressItem('Lessons Completed', '${skill['completed_lessons']}/${skill['total_lessons']}'),
-                    _buildProgressItem('Last Activity', _getTimeAgo(skill['last_activity'])),
-                    const SizedBox(height: 24),
-                    Text(
-                      'Learning Path',
-                      style: GoogleFonts.poppins(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    _buildLearningStep('1', 'Complete remaining lessons', skill['total_lessons'] - skill['completed_lessons']),
-                    _buildLearningStep('2', 'Take skill assessment', 1),
-                    _buildLearningStep('3', 'Complete practical project', 1),
-                    _buildLearningStep('4', 'Earn certification', 1),
-                    const SizedBox(height: 24),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                          _continueLearning(skill);
-                        },
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed: () => _takeAssessment(skill),
+                        icon: Icon(Icons.quiz, size: 16),
+                        label: Text('Assessment', style: GoogleFonts.poppins(fontSize: 12)),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: deepPurple,
                           foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        child: Text(
-                          'Continue Learning',
-                          style: GoogleFonts.poppins(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 16,
+                            borderRadius: BorderRadius.circular(8),
                           ),
                         ),
                       ),
                     ),
                   ],
                 ),
-              ),
+              ],
             ),
-          ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProgressStat(String label, String value, Color color) {
+    return Column(
+      children: [
+        Text(
+          value,
+          style: GoogleFonts.poppins(
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+            color: color,
+          ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildProgressItem(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            label,
-            style: GoogleFonts.poppins(
-              fontSize: 14,
-              color: Colors.grey[600],
-            ),
+        const SizedBox(height: 4),
+        Text(
+          label,
+          style: GoogleFonts.poppins(
+            fontSize: 12,
+            color: Colors.grey[600],
           ),
-          Text(
-            value,
-            style: GoogleFonts.poppins(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: deepPurple,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildLearningStep(String number, String description, int remaining) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: Row(
-        children: [
-          Container(
-            width: 24,
-            height: 24,
-            decoration: BoxDecoration(
-              color: remaining > 0 ? Colors.grey[300] : Colors.green,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Center(
-              child: Text(
-                number,
-                style: GoogleFonts.poppins(
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                  color: remaining > 0 ? Colors.grey[600] : Colors.white,
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              description,
-              style: GoogleFonts.poppins(
-                fontSize: 14,
-                color: remaining > 0 ? Colors.grey[700] : Colors.green,
-              ),
-            ),
-          ),
-          if (remaining > 0)
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(
-                color: Colors.orange.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                '$remaining remaining',
-                style: GoogleFonts.poppins(
-                  fontSize: 10,
-                  color: Colors.orange,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-        ],
-      ),
+          textAlign: TextAlign.center,
+        ),
+      ],
     );
   }
 
@@ -579,7 +459,7 @@ class _SkillProgressScreenState extends State<SkillProgressScreen> {
         title: Row(
           children: [
             Image.asset(
-              'assets/pages_items/task.png',
+              'assets/pages_assets/skill Progress.png',
               width: 24,
               height: 24,
               color: Colors.white,
@@ -604,9 +484,10 @@ class _SkillProgressScreenState extends State<SkillProgressScreen> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(
-                        Icons.school_outlined,
-                        size: 64,
+                      Image.asset(
+                        'assets/pages_assets/skill Progress.png',
+                        width: 120,
+                        height: 120,
                         color: Colors.grey[400],
                       ),
                       const SizedBox(height: 16),
@@ -649,21 +530,22 @@ class _SkillProgressScreenState extends State<SkillProgressScreen> {
               : RefreshIndicator(
                   onRefresh: _loadSkills,
                   child: ListView(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(20),
                     children: [
                       // Header Section
                       Container(
                         width: double.infinity,
-                        padding: const EdgeInsets.all(20),
+                        padding: const EdgeInsets.all(24),
                         decoration: BoxDecoration(
                           color: deepPurple,
-                          borderRadius: BorderRadius.circular(16),
+                          borderRadius: BorderRadius.circular(20),
                         ),
                         child: Column(
                           children: [
-                            Icon(
-                              Icons.trending_up,
-                              size: 48,
+                            Image.asset(
+                              'assets/pages_assets/skill Progress.png',
+                              width: 80,
+                              height: 80,
                               color: Colors.white,
                             ),
                             const SizedBox(height: 16),
@@ -672,13 +554,13 @@ class _SkillProgressScreenState extends State<SkillProgressScreen> {
                               style: GoogleFonts.poppins(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
-                                fontSize: 20,
+                                fontSize: 24,
                               ),
                               textAlign: TextAlign.center,
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              'Track your progress and continue learning',
+                              'Track your progress and continue building your career',
                               style: GoogleFonts.poppins(
                                 color: Colors.white.withOpacity(0.9),
                                 fontSize: 14,
@@ -696,54 +578,61 @@ class _SkillProgressScreenState extends State<SkillProgressScreen> {
                       const SizedBox(height: 24),
 
                       // Quick Actions
-                      Card(
-                        elevation: 2,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Quick Actions',
-                                style: GoogleFonts.poppins(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                  color: deepPurple,
+                      Container(
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Quick Actions',
+                              style: GoogleFonts.poppins(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                                color: deepPurple,
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: OutlinedButton.icon(
+                                    onPressed: () => Navigator.pushNamed(context, '/skills'),
+                                    icon: Icon(Icons.add, size: 16),
+                                    label: Text('Add Skill', style: GoogleFonts.poppins(fontSize: 12)),
+                                    style: OutlinedButton.styleFrom(
+                                      foregroundColor: deepPurple,
+                                      side: BorderSide(color: deepPurple),
+                                      padding: const EdgeInsets.symmetric(vertical: 12),
+                                    ),
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(height: 16),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: OutlinedButton.icon(
-                                      onPressed: () => Navigator.pushNamed(context, '/skills'),
-                                      icon: Icon(Icons.add, size: 16),
-                                      label: Text('Add Skill', style: GoogleFonts.poppins(fontSize: 12)),
-                                      style: OutlinedButton.styleFrom(
-                                        foregroundColor: deepPurple,
-                                        side: BorderSide(color: deepPurple),
-                                        padding: const EdgeInsets.symmetric(vertical: 8),
-                                      ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: ElevatedButton.icon(
+                                    onPressed: () => _loadSkills(),
+                                    icon: Icon(Icons.refresh, size: 16),
+                                    label: Text('Refresh', style: GoogleFonts.poppins(fontSize: 12)),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: deepPurple,
+                                      foregroundColor: Colors.white,
+                                      padding: const EdgeInsets.symmetric(vertical: 12),
                                     ),
                                   ),
-                                  const SizedBox(width: 12),
-                                  Expanded(
-                                    child: ElevatedButton.icon(
-                                      onPressed: () => _loadSkills(),
-                                      icon: Icon(Icons.refresh, size: 16),
-                                      label: Text('Refresh', style: GoogleFonts.poppins(fontSize: 12)),
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: deepPurple,
-                                        foregroundColor: Colors.white,
-                                        padding: const EdgeInsets.symmetric(vertical: 8),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
                       ),
                       const SizedBox(height: 32),
