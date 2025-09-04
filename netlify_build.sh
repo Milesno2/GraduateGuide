@@ -35,11 +35,19 @@ flutter pub get
 echo "🧹 Cleaning previous builds..."
 flutter clean
 
-# Ensure .env file exists
-if [ ! -f .env ]; then
-  echo "📝 Creating .env file from .env.example..."
-  cp .env.example .env
-fi
+# Create .env file from Netlify environment variables
+echo "📝 Creating .env file from environment variables..."
+cat > .env << EOF
+# Supabase Configuration
+SUPABASE_URL=${SUPABASE_URL:-https://zqcykjxwsnlxmtzcmiga.supabase.co}
+SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY:-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpxY3lranh3c25seG10emNtaWdhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY4NDI4MDgsImV4cCI6MjA3MjQxODgwOH0.dkH258TCMv4q7XXLknfnLNCJu1LVqEGdzabsh-0Oj7s}
+
+# App Configuration
+APP_NAME=${APP_NAME:-Graduate Assistant Hub}
+APP_VERSION=${APP_VERSION:-1.0.0}
+EOF
+
+echo "✅ Environment variables configured"
 
 # Build for web with specific renderer
 echo "🔨 Building Flutter web app..."
