@@ -52,9 +52,9 @@ EOF
 
 echo "✅ Environment variables configured"
 
-# Build for web with specific renderer
+# Build for web with correct command
 echo "🔨 Building Flutter web app..."
-flutter build web --release --web-renderer html --no-tree-shake-icons
+flutter build web --release
 
 echo "✅ Build completed successfully!"
 echo "📁 Build output: build/web/"
