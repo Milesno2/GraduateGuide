@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:newly_graduate_hub/services/supabase_service.dart';
 
 class JobsScreen extends StatefulWidget {
@@ -12,32 +13,312 @@ class JobsScreen extends StatefulWidget {
 class _JobsScreenState extends State<JobsScreen> {
   final Color deepPurple = const Color(0xFF6C2786);
   final SupabaseService _supabaseService = SupabaseService();
-  final TextEditingController _searchController = TextEditingController();
   
+  String searchText = '';
+  String selectedCategory = 'All';
   List<Map<String, dynamic>> _jobs = [];
-  List<Map<String, dynamic>> _filteredJobs = [];
   bool _isLoading = true;
-  String _selectedCategory = 'All';
-  String? _currentUserId;
 
-  final List<String> _categories = [
+  final List<String> categories = [
     'All',
     'Technology',
     'Finance',
     'Healthcare',
     'Education',
+    'Manufacturing',
+    'Oil & Gas',
+    'Telecommunications',
+    'Consulting',
     'Marketing',
-    'Engineering',
-    'Design',
-    'Sales',
-    'Administration',
+  ];
+
+  final List<Map<String, dynamic>> nigerianJobs = [
+    {
+      'id': '1',
+      'title': 'Software Developer',
+      'company': 'Flutterwave',
+      'location': 'Lagos, Nigeria',
+      'type': 'Full-time',
+      'salary': '₦300,000 - ₦500,000',
+      'experience': '2-4 years',
+      'category': 'Technology',
+      'description': 'We are looking for a skilled Software Developer to join our team. You will be responsible for developing and maintaining web applications using modern technologies.',
+      'requirements': [
+        'Bachelor\'s degree in Computer Science or related field',
+        'Proficiency in JavaScript, Python, or Java',
+        'Experience with React, Node.js, or Django',
+        'Strong problem-solving skills',
+        'Good communication skills',
+      ],
+      'benefits': [
+        'Health insurance',
+        'Flexible working hours',
+        'Remote work options',
+        'Professional development',
+        'Performance bonuses',
+      ],
+      'logo': 'assets/pages_items/fmn_logo.png',
+      'posted': '2 days ago',
+      'applications': 45,
+    },
+    {
+      'id': '2',
+      'title': 'Financial Analyst',
+      'company': 'GTBank',
+      'location': 'Lagos, Nigeria',
+      'type': 'Full-time',
+      'salary': '₦250,000 - ₦400,000',
+      'experience': '1-3 years',
+      'category': 'Finance',
+      'description': 'Join our finance team to analyze financial data, prepare reports, and provide insights to support business decisions.',
+      'requirements': [
+        'Bachelor\'s degree in Finance, Accounting, or Economics',
+        'Strong analytical and Excel skills',
+        'Knowledge of financial modeling',
+        'Attention to detail',
+        'Professional certification (ACCA, CFA) preferred',
+      ],
+      'benefits': [
+        'Competitive salary',
+        'Health insurance',
+        'Pension scheme',
+        'Annual leave',
+        'Training opportunities',
+      ],
+      'logo': 'assets/pages_items/fmn_logo.png',
+      'posted': '1 week ago',
+      'applications': 32,
+    },
+    {
+      'id': '3',
+      'title': 'Medical Officer',
+      'company': 'Lagos University Teaching Hospital',
+      'location': 'Lagos, Nigeria',
+      'type': 'Full-time',
+      'salary': '₦400,000 - ₦600,000',
+      'experience': '3-5 years',
+      'category': 'Healthcare',
+      'description': 'Provide medical care to patients, conduct examinations, and collaborate with healthcare teams.',
+      'requirements': [
+        'MBBS degree from recognized institution',
+        'Valid medical license',
+        'Residency training completed',
+        'Experience in general practice',
+        'Good bedside manner',
+      ],
+      'benefits': [
+        'Comprehensive health coverage',
+        'Housing allowance',
+        'Transport allowance',
+        'Continuing education',
+        'Research opportunities',
+      ],
+      'logo': 'assets/pages_items/fmn_logo.png',
+      'posted': '3 days ago',
+      'applications': 28,
+    },
+    {
+      'id': '4',
+      'title': 'Marketing Specialist',
+      'company': 'MTN Nigeria',
+      'location': 'Lagos, Nigeria',
+      'type': 'Full-time',
+      'salary': '₦350,000 - ₦550,000',
+      'experience': '4-6 years',
+      'category': 'Marketing',
+      'description': 'Develop and execute marketing strategies to promote our products and services in the Nigerian market.',
+      'requirements': [
+        'Bachelor\'s degree in Marketing or Business',
+        'Proven marketing experience',
+        'Digital marketing skills',
+        'Strong leadership abilities',
+        'Excellent communication skills',
+      ],
+      'benefits': [
+        'Attractive salary package',
+        'Performance bonuses',
+        'Health insurance',
+        'Phone and data allowance',
+        'Career growth opportunities',
+      ],
+      'logo': 'assets/pages_items/fmn_logo.png',
+      'posted': '5 days ago',
+      'applications': 67,
+    },
+    {
+      'id': '5',
+      'title': 'Civil Engineer',
+      'company': 'Julius Berger Nigeria',
+      'location': 'Abuja, Nigeria',
+      'type': 'Full-time',
+      'salary': '₦400,000 - ₦650,000',
+      'experience': '3-5 years',
+      'category': 'Manufacturing',
+      'description': 'Design and oversee construction projects, ensure quality standards, and manage project timelines.',
+      'requirements': [
+        'Bachelor\'s degree in Civil Engineering',
+        'Professional engineering license',
+        'Experience in construction management',
+        'AutoCAD proficiency',
+        'Project management skills',
+      ],
+      'benefits': [
+        'Competitive salary',
+        'Housing allowance',
+        'Transport allowance',
+        'Professional development',
+        'Health insurance',
+      ],
+      'logo': 'assets/pages_items/fmn_logo.png',
+      'posted': '1 week ago',
+      'applications': 23,
+    },
+    {
+      'id': '6',
+      'title': 'Data Scientist',
+      'company': 'Interswitch',
+      'location': 'Lagos, Nigeria',
+      'type': 'Full-time',
+      'salary': '₦450,000 - ₦700,000',
+      'experience': '2-4 years',
+      'category': 'Technology',
+      'description': 'Analyze large datasets to extract insights and develop predictive models for business decisions.',
+      'requirements': [
+        'Master\'s degree in Data Science or Statistics',
+        'Proficiency in Python, R, or SQL',
+        'Machine learning experience',
+        'Statistical analysis skills',
+        'Business acumen',
+      ],
+      'benefits': [
+        'High salary package',
+        'Stock options',
+        'Flexible work arrangements',
+        'Learning budget',
+        'Conference attendance',
+      ],
+      'logo': 'assets/pages_items/fmn_logo.png',
+      'posted': '4 days ago',
+      'applications': 38,
+    },
+    {
+      'id': '7',
+      'title': 'Business Consultant',
+      'company': 'KPMG Nigeria',
+      'location': 'Lagos, Nigeria',
+      'type': 'Full-time',
+      'salary': '₦300,000 - ₦500,000',
+      'experience': '3-5 years',
+      'category': 'Consulting',
+      'description': 'Provide strategic advice to clients, conduct business analysis, and develop improvement recommendations.',
+      'requirements': [
+        'Bachelor\'s degree in Business or related field',
+        'Consulting experience preferred',
+        'Strong analytical skills',
+        'Excellent presentation skills',
+        'Problem-solving abilities',
+      ],
+      'benefits': [
+        'Competitive salary',
+        'Performance bonuses',
+        'Health insurance',
+        'Professional development',
+        'Travel opportunities',
+      ],
+      'logo': 'assets/pages_items/fmn_logo.png',
+      'posted': '6 days ago',
+      'applications': 41,
+    },
+    {
+      'id': '8',
+      'title': 'Petroleum Engineer',
+      'company': 'Shell Nigeria',
+      'location': 'Port Harcourt, Nigeria',
+      'type': 'Full-time',
+      'salary': '₦600,000 - ₦900,000',
+      'experience': '4-6 years',
+      'category': 'Oil & Gas',
+      'description': 'Design and optimize oil and gas production systems, ensure safety standards, and maximize efficiency.',
+      'requirements': [
+        'Bachelor\'s degree in Petroleum Engineering',
+        'Experience in upstream operations',
+        'Knowledge of production optimization',
+        'Safety certification',
+        'Team leadership skills',
+      ],
+      'benefits': [
+        'Excellent salary package',
+        'Housing allowance',
+        'Transport allowance',
+        'Health insurance',
+        'International opportunities',
+      ],
+      'logo': 'assets/pages_items/fmn_logo.png',
+      'posted': '2 weeks ago',
+      'applications': 19,
+    },
+    {
+      'id': '9',
+      'title': 'Network Engineer',
+      'company': 'Airtel Nigeria',
+      'location': 'Lagos, Nigeria',
+      'type': 'Full-time',
+      'salary': '₦350,000 - ₦550,000',
+      'experience': '2-4 years',
+      'category': 'Telecommunications',
+      'description': 'Design, implement, and maintain network infrastructure to ensure optimal performance and reliability.',
+      'requirements': [
+        'Bachelor\'s degree in Computer Engineering or IT',
+        'CCNA or CCNP certification',
+        'Network administration experience',
+        'Troubleshooting skills',
+        'Knowledge of telecom protocols',
+      ],
+      'benefits': [
+        'Competitive salary',
+        'Health insurance',
+        'Phone and data allowance',
+        'Training opportunities',
+        'Career advancement',
+      ],
+      'logo': 'assets/pages_items/fmn_logo.png',
+      'posted': '1 week ago',
+      'applications': 34,
+    },
+    {
+      'id': '10',
+      'title': 'Lecturer',
+      'company': 'University of Lagos',
+      'location': 'Lagos, Nigeria',
+      'type': 'Full-time',
+      'salary': '₦250,000 - ₦400,000',
+      'experience': '3-5 years',
+      'category': 'Education',
+      'description': 'Teach undergraduate and postgraduate courses, conduct research, and contribute to academic development.',
+      'requirements': [
+        'PhD in relevant field',
+        'Teaching experience',
+        'Research publications',
+        'Excellent communication skills',
+        'Commitment to academic excellence',
+      ],
+      'benefits': [
+        'Academic freedom',
+        'Research funding',
+        'Conference attendance',
+        'Health insurance',
+        'Housing allowance',
+      ],
+      'logo': 'assets/pages_items/fmn_logo.png',
+      'posted': '3 weeks ago',
+      'applications': 15,
+    },
   ];
 
   @override
   void initState() {
     super.initState();
     _loadJobs();
-    _searchController.addListener(_filterJobs);
   }
 
   Future<void> _loadJobs() async {
@@ -45,157 +326,24 @@ class _JobsScreenState extends State<JobsScreen> {
       _isLoading = true;
     });
 
-    final user = _supabaseService.getCurrentUser();
-    if (user != null) {
-      _currentUserId = user.id;
-    }
-
-    // Mock job data - in real app, this would come from backend
+    // Simulate API call
     await Future.delayed(const Duration(milliseconds: 800));
     
     setState(() {
-      _jobs = [
-        {
-          'id': '1',
-          'title': 'Software Developer',
-          'company': 'TechCorp Nigeria',
-          'location': 'Lagos, Nigeria',
-          'salary': '₦150,000 - ₦250,000',
-          'type': 'Full-time',
-          'category': 'Technology',
-          'description': 'We are looking for a skilled software developer to join our team. Experience with Flutter, React, and Node.js required.',
-          'requirements': [
-            'Bachelor\'s degree in Computer Science or related field',
-            '2+ years of experience in software development',
-            'Proficiency in Flutter, React, and Node.js',
-            'Strong problem-solving skills',
-            'Good communication skills',
-          ],
-          'posted_date': DateTime.now().subtract(const Duration(days: 2)),
-          'is_featured': true,
-          'logo': 'assets/pages_items/job.png',
-        },
-        {
-          'id': '2',
-          'title': 'Data Analyst',
-          'company': 'DataFlow Solutions',
-          'location': 'Abuja, Nigeria',
-          'salary': '₦120,000 - ₦180,000',
-          'type': 'Full-time',
-          'category': 'Technology',
-          'description': 'Join our data team to help analyze business metrics and provide insights for decision making.',
-          'requirements': [
-            'Bachelor\'s degree in Statistics, Mathematics, or related field',
-            'Experience with SQL and Python',
-            'Knowledge of data visualization tools',
-            'Analytical thinking',
-            'Attention to detail',
-          ],
-          'posted_date': DateTime.now().subtract(const Duration(days: 1)),
-          'is_featured': false,
-          'logo': 'assets/pages_items/job.png',
-        },
-        {
-          'id': '3',
-          'title': 'UX/UI Designer',
-          'company': 'Creative Studios',
-          'location': 'Port Harcourt, Nigeria',
-          'salary': '₦100,000 - ₦150,000',
-          'type': 'Contract',
-          'category': 'Design',
-          'description': 'Create beautiful and functional user interfaces for web and mobile applications.',
-          'requirements': [
-            'Portfolio showcasing design work',
-            'Experience with Figma and Adobe Creative Suite',
-            'Understanding of user-centered design principles',
-            'Knowledge of design systems',
-            'Collaborative mindset',
-          ],
-          'posted_date': DateTime.now().subtract(const Duration(hours: 6)),
-          'is_featured': true,
-          'logo': 'assets/pages_items/job.png',
-        },
-        {
-          'id': '4',
-          'title': 'Marketing Specialist',
-          'company': 'Growth Marketing Ltd',
-          'location': 'Kano, Nigeria',
-          'salary': '₦80,000 - ₦120,000',
-          'type': 'Full-time',
-          'category': 'Marketing',
-          'description': 'Develop and execute marketing strategies to drive brand awareness and customer acquisition.',
-          'requirements': [
-            'Bachelor\'s degree in Marketing or related field',
-            'Experience with digital marketing tools',
-            'Strong analytical skills',
-            'Creative thinking',
-            'Excellent communication skills',
-          ],
-          'posted_date': DateTime.now().subtract(const Duration(days: 3)),
-          'is_featured': false,
-          'logo': 'assets/pages_items/job.png',
-        },
-        {
-          'id': '5',
-          'title': 'DevOps Engineer',
-          'company': 'CloudTech Solutions',
-          'location': 'Remote',
-          'salary': '₦200,000 - ₦300,000',
-          'type': 'Full-time',
-          'category': 'Technology',
-          'description': 'Build and maintain our cloud infrastructure and deployment pipelines.',
-          'requirements': [
-            'Experience with AWS, Azure, or GCP',
-            'Knowledge of Docker and Kubernetes',
-            'Experience with CI/CD pipelines',
-            'Linux system administration skills',
-            'Automation mindset',
-          ],
-          'posted_date': DateTime.now().subtract(const Duration(hours: 12)),
-          'is_featured': true,
-          'logo': 'assets/pages_items/job.png',
-        },
-      ];
-      _filteredJobs = _jobs;
+      _jobs = nigerianJobs;
       _isLoading = false;
     });
   }
 
-  void _filterJobs() {
-    final searchTerm = _searchController.text.toLowerCase();
-    final categoryFilter = _selectedCategory == 'All' ? null : _selectedCategory;
-
-    setState(() {
-      _filteredJobs = _jobs.where((job) {
-        final matchesSearch = job['title'].toLowerCase().contains(searchTerm) ||
-            job['company'].toLowerCase().contains(searchTerm) ||
-            job['location'].toLowerCase().contains(searchTerm);
-        
-        final matchesCategory = categoryFilter == null || job['category'] == categoryFilter;
-        
-        return matchesSearch && matchesCategory;
-      }).toList();
-    });
-  }
-
-  void _onCategoryChanged(String category) {
-    setState(() {
-      _selectedCategory = category;
-    });
-    _filterJobs();
-  }
-
-  String _getTimeAgo(DateTime date) {
-    final now = DateTime.now();
-    final difference = now.difference(date);
-
-    if (difference.inDays > 0) {
-      return '${difference.inDays} day${difference.inDays > 1 ? 's' : ''} ago';
-    } else if (difference.inHours > 0) {
-      return '${difference.inHours} hour${difference.inHours > 1 ? 's' : ''} ago';
-    } else {
-      return 'Just posted';
-    }
+  List<Map<String, dynamic>> get filteredJobs {
+    return _jobs.where((job) {
+      final matchesCategory = selectedCategory == 'All' || job['category'] == selectedCategory;
+      final matchesSearch = searchText.isEmpty ||
+          job['title'].toString().toLowerCase().contains(searchText.toLowerCase()) ||
+          job['company'].toString().toLowerCase().contains(searchText.toLowerCase()) ||
+          job['location'].toString().toLowerCase().contains(searchText.toLowerCase());
+      return matchesCategory && matchesSearch;
+    }).toList();
   }
 
   void _showJobDetails(Map<String, dynamic> job) {
@@ -204,7 +352,7 @@ class _JobsScreenState extends State<JobsScreen> {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => Container(
-        height: MediaQuery.of(context).size.height * 0.8,
+        height: MediaQuery.of(context).size.height * 0.9,
         decoration: const BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.only(
@@ -229,19 +377,16 @@ class _JobsScreenState extends State<JobsScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // Job Header
                     Row(
                       children: [
-                        Container(
-                          width: 60,
-                          height: 60,
-                          decoration: BoxDecoration(
-                            color: deepPurple.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
                           child: Image.asset(
                             job['logo'],
-                            width: 40,
-                            height: 40,
+                            width: 60,
+                            height: 60,
+                            fit: BoxFit.cover,
                           ),
                         ),
                         const SizedBox(width: 16),
@@ -253,7 +398,8 @@ class _JobsScreenState extends State<JobsScreen> {
                                 job['title'],
                                 style: GoogleFonts.poppins(
                                   fontWeight: FontWeight.bold,
-                                  fontSize: 18,
+                                  fontSize: 20,
+                                  color: deepPurple,
                                 ),
                               ),
                               const SizedBox(height: 4),
@@ -261,38 +407,58 @@ class _JobsScreenState extends State<JobsScreen> {
                                 job['company'],
                                 style: GoogleFonts.poppins(
                                   fontSize: 16,
-                                  color: deepPurple,
+                                  color: Colors.grey[700],
+                                  fontWeight: FontWeight.w500,
                                 ),
                               ),
                               const SizedBox(height: 4),
-                              Text(
-                                job['location'],
-                                style: GoogleFonts.poppins(
-                                  fontSize: 14,
-                                  color: Colors.grey[600],
-                                ),
+                              Row(
+                                children: [
+                                  Icon(Icons.location_on, size: 16, color: Colors.grey[600]),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    job['location'],
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 14,
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
                         ),
                       ],
                     ),
+                    
                     const SizedBox(height: 24),
+                    
+                    // Job Details
                     Row(
                       children: [
-                        _buildJobTag(job['type'], Colors.green),
-                        const SizedBox(width: 8),
-                        _buildJobTag(job['category'], deepPurple),
-                        const SizedBox(width: 8),
-                        _buildJobTag(job['salary'], Colors.orange),
+                        Expanded(
+                          child: _buildDetailCard('Salary', job['salary'], Icons.attach_money, Colors.green),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: _buildDetailCard('Experience', job['experience'], Icons.work, Colors.blue),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: _buildDetailCard('Type', job['type'], Icons.schedule, Colors.orange),
+                        ),
                       ],
                     ),
+                    
                     const SizedBox(height: 24),
+                    
+                    // Description
                     Text(
                       'Job Description',
                       style: GoogleFonts.poppins(
                         fontWeight: FontWeight.bold,
-                        fontSize: 16,
+                        fontSize: 18,
+                        color: deepPurple,
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -301,23 +467,28 @@ class _JobsScreenState extends State<JobsScreen> {
                       style: GoogleFonts.poppins(
                         fontSize: 14,
                         color: Colors.grey[700],
+                        height: 1.5,
                       ),
                     ),
+                    
                     const SizedBox(height: 24),
+                    
+                    // Requirements
                     Text(
                       'Requirements',
                       style: GoogleFonts.poppins(
                         fontWeight: FontWeight.bold,
-                        fontSize: 16,
+                        fontSize: 18,
+                        color: deepPurple,
                       ),
                     ),
                     const SizedBox(height: 8),
-                    ...job['requirements'].map((req) => Padding(
+                    ...job['requirements'].map<Widget>((req) => Padding(
                       padding: const EdgeInsets.only(bottom: 8),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Icon(Icons.check_circle, size: 16, color: Colors.green),
+                          Icon(Icons.check_circle, size: 16, color: Colors.green),
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
@@ -330,31 +501,90 @@ class _JobsScreenState extends State<JobsScreen> {
                           ),
                         ],
                       ),
-                    )),
-                    const SizedBox(height: 32),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                          _applyForJob(job);
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: deepPurple,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        child: Text(
-                          'Apply Now',
-                          style: GoogleFonts.poppins(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 16,
-                          ),
-                        ),
+                    )).toList(),
+                    
+                    const SizedBox(height: 24),
+                    
+                    // Benefits
+                    Text(
+                      'Benefits',
+                      style: GoogleFonts.poppins(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                        color: deepPurple,
                       ),
+                    ),
+                    const SizedBox(height: 8),
+                    ...job['benefits'].map<Widget>((benefit) => Padding(
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Icon(Icons.star, size: 16, color: Colors.amber),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              benefit,
+                              style: GoogleFonts.poppins(
+                                fontSize: 14,
+                                color: Colors.grey[700],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )).toList(),
+                    
+                    const SizedBox(height: 32),
+                    
+                    // Action Buttons
+                    Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton(
+                            onPressed: () => Navigator.pop(context),
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: deepPurple,
+                              side: BorderSide(color: deepPurple),
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            child: Text(
+                              'Save Job',
+                              style: GoogleFonts.poppins(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                              _applyForJob(job);
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: deepPurple,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            child: Text(
+                              'Apply Now',
+                              style: GoogleFonts.poppins(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -362,6 +592,40 @@ class _JobsScreenState extends State<JobsScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildDetailCard(String label, String value, IconData icon, Color color) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: color.withOpacity(0.3)),
+      ),
+      child: Column(
+        children: [
+          Icon(icon, color: color, size: 20),
+          const SizedBox(height: 4),
+          Text(
+            value,
+            style: GoogleFonts.poppins(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: color,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          Text(
+            label,
+            style: GoogleFonts.poppins(
+              fontSize: 10,
+              color: Colors.grey[600],
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
       ),
     );
   }
@@ -377,7 +641,7 @@ class _JobsScreenState extends State<JobsScreen> {
       child: Text(
         text,
         style: GoogleFonts.poppins(
-          fontSize: 12,
+          fontSize: 10,
           fontWeight: FontWeight.w500,
           color: color,
         ),
@@ -394,7 +658,7 @@ class _JobsScreenState extends State<JobsScreen> {
         ),
         backgroundColor: Colors.green,
         action: SnackBarAction(
-          label: 'View',
+          label: 'View Applications',
           textColor: Colors.white,
           onPressed: () {
             // Navigate to applications screen
@@ -433,82 +697,125 @@ class _JobsScreenState extends State<JobsScreen> {
       ),
       body: Column(
         children: [
-          // Search and Filter Section
+          // Header Section
           Container(
-            padding: const EdgeInsets.all(16),
-            color: Colors.white,
+            width: double.infinity,
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: deepPurple,
+              borderRadius: const BorderRadius.only(
+                bottomLeft: Radius.circular(20),
+                bottomRight: Radius.circular(20),
+              ),
+            ),
             child: Column(
               children: [
-                // Search Bar
-                TextField(
-                  controller: _searchController,
-                  decoration: InputDecoration(
-                    hintText: 'Search jobs, companies, or locations...',
-                    hintStyle: GoogleFonts.poppins(color: Colors.grey[500]),
-                    prefixIcon: Icon(Icons.search, color: Colors.grey[500]),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: Colors.grey[300]!),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: Colors.grey[300]!),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: deepPurple, width: 2),
-                    ),
-                    filled: true,
-                    fillColor: Colors.grey[50],
+                Text(
+                  'Find Your Dream Job',
+                  style: GoogleFonts.poppins(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
                   ),
                 ),
-                const SizedBox(height: 16),
-                // Category Filter
-                SizedBox(
-                  height: 40,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: _categories.length,
-                    itemBuilder: (context, index) {
-                      final category = _categories[index];
-                      final isSelected = category == _selectedCategory;
-                      
-                      return Container(
-                        margin: EdgeInsets.only(right: index < _categories.length - 1 ? 8 : 0),
-                        child: FilterChip(
-                          label: Text(
-                            category,
-                            style: GoogleFonts.poppins(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                              color: isSelected ? Colors.white : deepPurple,
-                            ),
-                          ),
-                          selected: isSelected,
-                          onSelected: (_) => _onCategoryChanged(category),
-                          backgroundColor: Colors.grey[100],
-                          selectedColor: deepPurple,
-                          checkmarkColor: Colors.white,
-                        ),
-                      );
-                    },
+                const SizedBox(height: 8),
+                Text(
+                  'Discover opportunities with top Nigerian companies',
+                  style: GoogleFonts.poppins(
+                    color: Colors.white.withOpacity(0.9),
+                    fontSize: 14,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 20),
+                
+                // Search Bar
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: TextField(
+                    onChanged: (val) => setState(() => searchText = val),
+                    decoration: InputDecoration(
+                      hintText: 'Search jobs, companies, or locations...',
+                      hintStyle: GoogleFonts.poppins(
+                        color: Colors.grey[500],
+                        fontSize: 14,
+                      ),
+                      border: InputBorder.none,
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
+                      prefixIcon: Icon(
+                        Icons.search,
+                        color: Colors.grey[500],
+                        size: 20,
+                      ),
+                    ),
                   ),
                 ),
               ],
             ),
           ),
-          // Job Listings
+          
+          // Category Filters
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: categories.map((category) {
+                  final isSelected = selectedCategory == category;
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 12),
+                    child: FilterChip(
+                      label: Text(
+                        category,
+                        style: GoogleFonts.poppins(
+                          color: isSelected ? Colors.white : Colors.grey[700],
+                          fontWeight: FontWeight.w500,
+                          fontSize: 13,
+                        ),
+                      ),
+                      selected: isSelected,
+                      selectedColor: deepPurple,
+                      backgroundColor: Colors.white,
+                      side: BorderSide(
+                        color: isSelected ? deepPurple : Colors.grey[300]!,
+                      ),
+                      onSelected: (_) => setState(() => selectedCategory = category),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
+          ),
+          
+          // Jobs List
           Expanded(
             child: _isLoading
                 ? const Center(child: CircularProgressIndicator())
-                : _filteredJobs.isEmpty
+                : filteredJobs.isEmpty
                     ? Center(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(
-                              Icons.work_outline,
-                              size: 64,
+                            Image.asset(
+                              'assets/pages_items/job.png',
+                              width: 120,
+                              height: 120,
                               color: Colors.grey[400],
                             ),
                             const SizedBox(height: 16),
@@ -532,108 +839,11 @@ class _JobsScreenState extends State<JobsScreen> {
                         ),
                       )
                     : ListView.builder(
-                        padding: const EdgeInsets.all(16),
-                        itemCount: _filteredJobs.length,
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        itemCount: filteredJobs.length,
                         itemBuilder: (context, index) {
-                          final job = _filteredJobs[index];
-                          return Container(
-                            margin: const EdgeInsets.only(bottom: 16),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(12),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.05),
-                                  blurRadius: 4,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ],
-                            ),
-                            child: ListTile(
-                              contentPadding: const EdgeInsets.all(16),
-                              leading: Container(
-                                width: 50,
-                                height: 50,
-                                decoration: BoxDecoration(
-                                  color: deepPurple.withOpacity(0.1),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Image.asset(
-                                  job['logo'],
-                                  width: 30,
-                                  height: 30,
-                                ),
-                              ),
-                              title: Row(
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      job['title'],
-                                      style: GoogleFonts.poppins(
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 16,
-                                      ),
-                                    ),
-                                  ),
-                                  if (job['is_featured'])
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                      decoration: BoxDecoration(
-                                        color: Colors.orange,
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      child: Text(
-                                        'Featured',
-                                        style: GoogleFonts.poppins(
-                                          fontSize: 10,
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                    ),
-                                ],
-                              ),
-                              subtitle: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    job['company'],
-                                    style: GoogleFonts.poppins(
-                                      fontSize: 14,
-                                      color: deepPurple,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    job['location'],
-                                    style: GoogleFonts.poppins(
-                                      fontSize: 13,
-                                      color: Colors.grey[600],
-                                    ),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Row(
-                                    children: [
-                                      _buildJobTag(job['type'], Colors.green),
-                                      const SizedBox(width: 8),
-                                      _buildJobTag(job['salary'], Colors.orange),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    _getTimeAgo(job['posted_date']),
-                                    style: GoogleFonts.poppins(
-                                      fontSize: 12,
-                                      color: Colors.grey[500],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              onTap: () => _showJobDetails(job),
-                            ),
-                          );
+                          final job = filteredJobs[index];
+                          return _buildJobCard(job);
                         },
                       ),
           ),
@@ -642,9 +852,142 @@ class _JobsScreenState extends State<JobsScreen> {
     );
   }
 
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
+  Widget _buildJobCard(Map<String, dynamic> job) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: InkWell(
+        onTap: () => _showJobDetails(job),
+        borderRadius: BorderRadius.circular(16),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header
+              Row(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Image.asset(
+                      job['logo'],
+                      width: 50,
+                      height: 50,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          job['title'],
+                          style: GoogleFonts.poppins(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            color: deepPurple,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          job['company'],
+                          style: GoogleFonts.poppins(
+                            fontSize: 14,
+                            color: Colors.grey[700],
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  _buildJobTag(job['type'], Colors.green),
+                ],
+              ),
+              
+              const SizedBox(height: 12),
+              
+              // Location and Posted
+              Row(
+                children: [
+                  Icon(Icons.location_on, size: 14, color: Colors.grey[600]),
+                  const SizedBox(width: 4),
+                  Text(
+                    job['location'],
+                    style: GoogleFonts.poppins(
+                      fontSize: 13,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                  const Spacer(),
+                  Text(
+                    job['posted'],
+                    style: GoogleFonts.poppins(
+                      fontSize: 12,
+                      color: Colors.grey[500],
+                    ),
+                  ),
+                ],
+              ),
+              
+              const SizedBox(height: 12),
+              
+              // Salary and Experience
+              Row(
+                children: [
+                  Icon(Icons.attach_money, size: 14, color: Colors.green[600]),
+                  const SizedBox(width: 4),
+                  Text(
+                    job['salary'],
+                    style: GoogleFonts.poppins(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.green[600],
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Icon(Icons.work, size: 14, color: Colors.blue[600]),
+                  const SizedBox(width: 4),
+                  Text(
+                    job['experience'],
+                    style: GoogleFonts.poppins(
+                      fontSize: 13,
+                      color: Colors.blue[600],
+                    ),
+                  ),
+                ],
+              ),
+              
+              const SizedBox(height: 12),
+              
+              // Category and Applications
+              Row(
+                children: [
+                  _buildJobTag(job['category'], deepPurple),
+                  const Spacer(),
+                  Text(
+                    '${job['applications']} applications',
+                    style: GoogleFonts.poppins(
+                      fontSize: 12,
+                      color: Colors.grey[500],
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

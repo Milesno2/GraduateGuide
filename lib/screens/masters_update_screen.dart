@@ -12,80 +12,492 @@ class MastersUpdateScreen extends StatefulWidget {
 class _MastersUpdateScreenState extends State<MastersUpdateScreen> {
   final Color deepPurple = const Color(0xFF6C2786);
 
-  Future<void> _openExternal(String url) async {
-    final uri = Uri.parse(url);
-    final leave = await showDialog<bool>(
+  final List<Map<String, dynamic>> nigerianUniversities = [
+    {
+      'name': 'University of Lagos (UNILAG)',
+      'location': 'Lagos, Nigeria',
+      'logo': 'assets/pages_items/fmn_logo.png',
+      'programs': [
+        'MSc Computer Science',
+        'MSc Business Administration',
+        'MSc Economics',
+        'MSc Engineering',
+        'MSc Public Health',
+      ],
+      'tuition': '₦500,000 - ₦800,000',
+      'duration': '12-18 months',
+      'website': 'https://unilag.edu.ng',
+      'admission': 'September/January',
+      'requirements': ['Bachelor\'s degree', 'CGPA 3.0+', 'English proficiency'],
+    },
+    {
+      'name': 'University of Ibadan (UI)',
+      'location': 'Ibadan, Nigeria',
+      'logo': 'assets/pages_items/fmn_logo.png',
+      'programs': [
+        'MSc Information Science',
+        'MSc Agricultural Economics',
+        'MSc Biochemistry',
+        'MSc Statistics',
+        'MSc Public Administration',
+      ],
+      'tuition': '₦400,000 - ₦700,000',
+      'duration': '12-18 months',
+      'website': 'https://ui.edu.ng',
+      'admission': 'September/January',
+      'requirements': ['Bachelor\'s degree', 'CGPA 3.0+', 'English proficiency'],
+    },
+    {
+      'name': 'Obafemi Awolowo University (OAU)',
+      'location': 'Ile-Ife, Nigeria',
+      'logo': 'assets/pages_items/fmn_logo.png',
+      'programs': [
+        'MSc Technology Management',
+        'MSc Food Science',
+        'MSc Architecture',
+        'MSc Urban Planning',
+        'MSc Environmental Management',
+      ],
+      'tuition': '₦350,000 - ₦600,000',
+      'duration': '12-18 months',
+      'website': 'https://oauife.edu.ng',
+      'admission': 'September/January',
+      'requirements': ['Bachelor\'s degree', 'CGPA 3.0+', 'English proficiency'],
+    },
+    {
+      'name': 'Ahmadu Bello University (ABU)',
+      'location': 'Zaria, Nigeria',
+      'logo': 'assets/pages_items/fmn_logo.png',
+      'programs': [
+        'MSc Agricultural Engineering',
+        'MSc Chemical Engineering',
+        'MSc Civil Engineering',
+        'MSc Electrical Engineering',
+        'MSc Mechanical Engineering',
+      ],
+      'tuition': '₦300,000 - ₦550,000',
+      'duration': '12-18 months',
+      'website': 'https://abu.edu.ng',
+      'admission': 'September/January',
+      'requirements': ['Bachelor\'s degree', 'CGPA 3.0+', 'English proficiency'],
+    },
+    {
+      'name': 'University of Nigeria (UNN)',
+      'location': 'Nsukka, Nigeria',
+      'logo': 'assets/pages_items/fmn_logo.png',
+      'programs': [
+        'MSc Mass Communication',
+        'MSc Library Science',
+        'MSc Political Science',
+        'MSc Sociology',
+        'MSc Psychology',
+      ],
+      'tuition': '₦400,000 - ₦650,000',
+      'duration': '12-18 months',
+      'website': 'https://unn.edu.ng',
+      'admission': 'September/January',
+      'requirements': ['Bachelor\'s degree', 'CGPA 3.0+', 'English proficiency'],
+    },
+    {
+      'name': 'Covenant University',
+      'location': 'Ota, Nigeria',
+      'logo': 'assets/pages_items/fmn_logo.png',
+      'programs': [
+        'MSc Information Technology',
+        'MSc Business Administration',
+        'MSc Architecture',
+        'MSc Civil Engineering',
+        'MSc Electrical Engineering',
+      ],
+      'tuition': '₦800,000 - ₦1,200,000',
+      'duration': '12-18 months',
+      'website': 'https://covenantuniversity.edu.ng',
+      'admission': 'September/January',
+      'requirements': ['Bachelor\'s degree', 'CGPA 3.5+', 'English proficiency'],
+    },
+    {
+      'name': 'Babcock University',
+      'location': 'Ilishan-Remo, Nigeria',
+      'logo': 'assets/pages_items/fmn_logo.png',
+      'programs': [
+        'MSc Computer Science',
+        'MSc Business Administration',
+        'MSc Public Health',
+        'MSc Information Technology',
+        'MSc Accounting',
+      ],
+      'tuition': '₦700,000 - ₦1,000,000',
+      'duration': '12-18 months',
+      'website': 'https://babcock.edu.ng',
+      'admission': 'September/January',
+      'requirements': ['Bachelor\'s degree', 'CGPA 3.0+', 'English proficiency'],
+    },
+    {
+      'name': 'Pan-Atlantic University',
+      'location': 'Lagos, Nigeria',
+      'logo': 'assets/pages_items/fmn_logo.png',
+      'programs': [
+        'MSc Media and Communication',
+        'MSc Business Administration',
+        'MSc Information Technology',
+        'MSc Entrepreneurship',
+        'MSc Marketing',
+      ],
+      'tuition': '₦1,000,000 - ₦1,500,000',
+      'duration': '12-18 months',
+      'website': 'https://pau.edu.ng',
+      'admission': 'September/January',
+      'requirements': ['Bachelor\'s degree', 'CGPA 3.0+', 'English proficiency'],
+    },
+  ];
+
+  void _showApplicationGuide() {
+    showModalBottomSheet(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text('Leave Graduate Guide?',
-            style: GoogleFonts.poppins(fontWeight: FontWeight.bold)),
-        content: Text(
-            'You are about to leave the Graduate Guide app and visit an external website. Continue?',
-            style: GoogleFonts.poppins()),
-        actions: [
-          TextButton(
-            child: Text('Cancel', style: GoogleFonts.poppins(color: Colors.grey)),
-            onPressed: () => Navigator.pop(ctx, false),
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        height: MediaQuery.of(context).size.height * 0.8,
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
           ),
-          TextButton(
-            child: Text('Continue', style: GoogleFonts.poppins(color: deepPurple)),
-            onPressed: () => Navigator.pop(ctx, true),
+        ),
+        child: Column(
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              margin: const EdgeInsets.symmetric(vertical: 12),
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Postgraduate Application Guide',
+                      style: GoogleFonts.poppins(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 24,
+                        color: deepPurple,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    
+                    // Application Steps
+                    Text(
+                      'Application Steps',
+                      style: GoogleFonts.poppins(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                        color: deepPurple,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    
+                    _buildStepItem('1', 'Research Programs', 'Identify universities and programs that match your career goals'),
+                    _buildStepItem('2', 'Check Requirements', 'Review admission requirements and deadlines'),
+                    _buildStepItem('3', 'Prepare Documents', 'Gather all required documents and transcripts'),
+                    _buildStepItem('4', 'Take Entrance Exams', 'Complete required entrance examinations if applicable'),
+                    _buildStepItem('5', 'Submit Application', 'Complete online application and pay fees'),
+                    _buildStepItem('6', 'Interview', 'Attend interview if required by the program'),
+                    _buildStepItem('7', 'Acceptance', 'Receive admission letter and confirm enrollment'),
+                    
+                    const SizedBox(height: 24),
+                    
+                    // Required Documents
+                    Text(
+                      'Required Documents',
+                      style: GoogleFonts.poppins(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                        color: deepPurple,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    
+                    _buildDocumentItem('Academic Transcripts', 'Official transcripts from all institutions attended'),
+                    _buildDocumentItem('Degree Certificate', 'Copy of your bachelor\'s degree certificate'),
+                    _buildDocumentItem('CV/Resume', 'Updated curriculum vitae highlighting relevant experience'),
+                    _buildDocumentItem('Statement of Purpose', 'Personal statement explaining your goals and motivation'),
+                    _buildDocumentItem('Letters of Recommendation', '2-3 academic or professional references'),
+                    _buildDocumentItem('English Proficiency', 'TOEFL or IELTS scores (if required)'),
+                    _buildDocumentItem('Application Fee', 'Payment receipt for application processing'),
+                    
+                    const SizedBox(height: 24),
+                    
+                    // Tips
+                    Text(
+                      'Application Tips',
+                      style: GoogleFonts.poppins(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                        color: deepPurple,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    
+                    _buildTipItem('Start Early', 'Begin your application process at least 6 months before deadline'),
+                    _buildTipItem('Research Thoroughly', 'Visit university websites and contact departments directly'),
+                    _buildTipItem('Prepare Strong SOP', 'Write a compelling statement of purpose'),
+                    _buildTipItem('Get Good References', 'Choose recommenders who know you well academically/professionally'),
+                    _buildTipItem('Follow Instructions', 'Carefully follow all application instructions and deadlines'),
+                    _buildTipItem('Proofread Everything', 'Ensure all documents are error-free and professional'),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStepItem(String number, String title, String description) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 28,
+            height: 28,
+            decoration: BoxDecoration(
+              color: deepPurple,
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Center(
+              child: Text(
+                number,
+                style: GoogleFonts.poppins(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 16,
+                    color: deepPurple,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  description,
+                  style: GoogleFonts.poppins(
+                    fontSize: 14,
+                    color: Colors.grey[600],
+                    height: 1.4,
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
     );
-    if (leave == true) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-    }
   }
 
-  Widget _buildUniversityCard({
-    required String name,
-    required String location,
-    required String description,
-    required List<String> programs,
-    required String applicationDeadline,
-    required String website,
-    required String logo,
-    bool isFeatured = false,
-  }) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 16),
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+  Widget _buildDocumentItem(String title, String description) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(Icons.check_circle, color: deepPurple, size: 20),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                    color: deepPurple,
+                  ),
+                ),
+                Text(
+                  description,
+                  style: GoogleFonts.poppins(
+                    fontSize: 13,
+                    color: Colors.grey[600],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTipItem(String title, String description) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(Icons.lightbulb, color: Colors.amber[700], size: 20),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                    color: Colors.amber[700],
+                  ),
+                ),
+                Text(
+                  description,
+                  style: GoogleFonts.poppins(
+                    fontSize: 13,
+                    color: Colors.grey[600],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatCard(String title, String value, IconData icon, Color color) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withOpacity(0.3)),
+      ),
       child: Column(
         children: [
+          Icon(icon, color: color, size: 24),
+          const SizedBox(height: 8),
+          Text(
+            value,
+            style: GoogleFonts.poppins(
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+              color: color,
+            ),
+          ),
+          Text(
+            title,
+            style: GoogleFonts.poppins(
+              fontSize: 12,
+              color: Colors.grey[600],
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildQuickLinkCard(String title, String description, IconData icon, VoidCallback onTap) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: ListTile(
+        leading: Container(
+          width: 48,
+          height: 48,
+          decoration: BoxDecoration(
+            color: deepPurple.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Icon(icon, color: deepPurple, size: 24),
+        ),
+        title: Text(
+          title,
+          style: GoogleFonts.poppins(
+            fontWeight: FontWeight.w600,
+            fontSize: 16,
+            color: deepPurple,
+          ),
+        ),
+        subtitle: Text(
+          description,
+          style: GoogleFonts.poppins(
+            fontSize: 13,
+            color: Colors.grey[600],
+          ),
+        ),
+        trailing: Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey[400]),
+        onTap: onTap,
+      ),
+    );
+  }
+
+  Widget _buildUniversityCard(Map<String, dynamic> university) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          // Header
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
               color: deepPurple.withOpacity(0.05),
               borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(12),
-                topRight: Radius.circular(12),
+                topLeft: Radius.circular(16),
+                topRight: Radius.circular(16),
               ),
             ),
             child: Row(
               children: [
-                Container(
-                  width: 60,
-                  height: 60,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 4,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8),
-                    child: Image.asset(
-                      logo,
-                      fit: BoxFit.contain,
-                    ),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Image.asset(
+                    university['logo'],
+                    width: 60,
+                    height: 60,
+                    fit: BoxFit.cover,
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -93,52 +505,27 @@ class _MastersUpdateScreenState extends State<MastersUpdateScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      Text(
+                        university['name'],
+                        style: GoogleFonts.poppins(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          color: deepPurple,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
                       Row(
                         children: [
-                          Expanded(
-                            child: Text(
-                              name,
-                              style: GoogleFonts.poppins(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                              ),
+                          Icon(Icons.location_on, size: 14, color: Colors.grey[600]),
+                          const SizedBox(width: 4),
+                          Text(
+                            university['location'],
+                            style: GoogleFonts.poppins(
+                              fontSize: 13,
+                              color: Colors.grey[600],
                             ),
                           ),
-                          if (isFeatured)
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                              decoration: BoxDecoration(
-                                color: Colors.orange,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Text(
-                                'Featured',
-                                style: GoogleFonts.poppins(
-                                  fontSize: 10,
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ),
                         ],
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        location,
-                        style: GoogleFonts.poppins(
-                          fontSize: 14,
-                          color: deepPurple,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Deadline: $applicationDeadline',
-                        style: GoogleFonts.poppins(
-                          fontSize: 12,
-                          color: Colors.red,
-                          fontWeight: FontWeight.w500,
-                        ),
                       ),
                     ],
                   ),
@@ -146,28 +533,14 @@ class _MastersUpdateScreenState extends State<MastersUpdateScreen> {
               ],
             ),
           ),
+          
+          // Content
           Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'About',
-                  style: GoogleFonts.poppins(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 14,
-                    color: deepPurple,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  description,
-                  style: GoogleFonts.poppins(
-                    fontSize: 14,
-                    color: Colors.grey[700],
-                  ),
-                ),
-                const SizedBox(height: 16),
+                // Programs
                 Text(
                   'Available Programs',
                   style: GoogleFonts.poppins(
@@ -177,61 +550,75 @@ class _MastersUpdateScreenState extends State<MastersUpdateScreen> {
                   ),
                 ),
                 const SizedBox(height: 8),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: programs.map((program) {
-                    return Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: deepPurple.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: deepPurple.withOpacity(0.3)),
-                      ),
-                      child: Text(
-                        program,
-                        style: GoogleFonts.poppins(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                          color: deepPurple,
+                ...university['programs'].map<Widget>((program) => Padding(
+                  padding: const EdgeInsets.only(bottom: 4),
+                  child: Row(
+                    children: [
+                      Icon(Icons.school, size: 12, color: Colors.grey[500]),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          program,
+                          style: GoogleFonts.poppins(
+                            fontSize: 13,
+                            color: Colors.grey[700],
+                          ),
                         ),
                       ),
-                    );
-                  }).toList(),
-                ),
+                    ],
+                  ),
+                )).toList(),
+                
                 const SizedBox(height: 16),
+                
+                // Details
                 Row(
                   children: [
                     Expanded(
-                      child: OutlinedButton(
-                        onPressed: () => _openExternal(website),
+                      child: _buildDetailItem('Tuition', university['tuition'], Icons.attach_money),
+                    ),
+                    Expanded(
+                      child: _buildDetailItem('Duration', university['duration'], Icons.access_time),
+                    ),
+                    Expanded(
+                      child: _buildDetailItem('Admission', university['admission'], Icons.calendar_today),
+                    ),
+                  ],
+                ),
+                
+                const SizedBox(height: 16),
+                
+                // Action Buttons
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () => _openExternal(university['website']),
+                        icon: Icon(Icons.language, size: 16),
+                        label: Text('Website', style: GoogleFonts.poppins(fontSize: 12)),
                         style: OutlinedButton.styleFrom(
                           foregroundColor: deepPurple,
                           side: BorderSide(color: deepPurple),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
-                        ),
-                        child: Text(
-                          'Visit Website',
-                          style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
                         ),
                       ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
-                      child: ElevatedButton(
-                        onPressed: () => _showApplicationGuide(name),
+                      child: ElevatedButton.icon(
+                        onPressed: () => _showUniversityDetails(university),
+                        icon: Icon(Icons.info, size: 16),
+                        label: Text('Details', style: GoogleFonts.poppins(fontSize: 12)),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: deepPurple,
                           foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 12),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
-                        ),
-                        child: Text(
-                          'Apply Now',
-                          style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
                         ),
                       ),
                     ),
@@ -245,104 +632,153 @@ class _MastersUpdateScreenState extends State<MastersUpdateScreen> {
     );
   }
 
-  void _showApplicationGuide(String universityName) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(
-          'Application Guide',
-          style: GoogleFonts.poppins(fontWeight: FontWeight.bold),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Steps to apply for $universityName:',
-              style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
-            ),
-            const SizedBox(height: 16),
-            _buildStepItem('1', 'Visit the university website'),
-            _buildStepItem('2', 'Create an account on the portal'),
-            _buildStepItem('3', 'Fill in your personal information'),
-            _buildStepItem('4', 'Upload required documents'),
-            _buildStepItem('5', 'Pay application fee'),
-            _buildStepItem('6', 'Submit your application'),
-            const SizedBox(height: 16),
-            Text(
-              'Required Documents:',
-              style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
-            ),
-            const SizedBox(height: 8),
-            _buildDocumentItem('Bachelor\'s degree certificate'),
-            _buildDocumentItem('Academic transcripts'),
-            _buildDocumentItem('CV/Resume'),
-            _buildDocumentItem('Statement of purpose'),
-            _buildDocumentItem('Letters of recommendation'),
-            _buildDocumentItem('Valid ID card'),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('Close', style: GoogleFonts.poppins()),
+  Widget _buildDetailItem(String label, String value, IconData icon) {
+    return Column(
+      children: [
+        Icon(icon, size: 16, color: Colors.grey[600]),
+        const SizedBox(height: 4),
+        Text(
+          value,
+          style: GoogleFonts.poppins(
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            color: deepPurple,
           ),
-        ],
-      ),
+          textAlign: TextAlign.center,
+        ),
+        Text(
+          label,
+          style: GoogleFonts.poppins(
+            fontSize: 10,
+            color: Colors.grey[600],
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ],
     );
   }
 
-  Widget _buildStepItem(String number, String text) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Row(
-        children: [
-          Container(
-            width: 20,
-            height: 20,
-            decoration: BoxDecoration(
-              color: deepPurple,
-              borderRadius: BorderRadius.circular(10),
+  void _showUniversityDetails(Map<String, dynamic> university) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        height: MediaQuery.of(context).size.height * 0.7,
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
+          ),
+        ),
+        child: Column(
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              margin: const EdgeInsets.symmetric(vertical: 12),
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(2),
+              ),
             ),
-            child: Center(
-              child: Text(
-                number,
-                style: GoogleFonts.poppins(
-                  color: Colors.white,
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      university['name'],
+                      style: GoogleFonts.poppins(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                        color: deepPurple,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      university['location'],
+                      style: GoogleFonts.poppins(
+                        fontSize: 14,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    
+                    Text(
+                      'Admission Requirements',
+                      style: GoogleFonts.poppins(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: deepPurple,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    ...university['requirements'].map<Widget>((req) => Padding(
+                      padding: const EdgeInsets.only(bottom: 4),
+                      child: Row(
+                        children: [
+                          Icon(Icons.check_circle, size: 16, color: Colors.green),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              req,
+                              style: GoogleFonts.poppins(
+                                fontSize: 14,
+                                color: Colors.grey[700],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )).toList(),
+                    
+                    const SizedBox(height: 20),
+                    
+                    Row(
+                      children: [
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: () => _openExternal(university['website']),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: deepPurple,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                            child: Text(
+                              'Visit Website',
+                              style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
             ),
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              text,
-              style: GoogleFonts.poppins(fontSize: 14),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildDocumentItem(String document) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 4),
-      child: Row(
-        children: [
-          const Icon(Icons.check_circle, size: 16, color: Colors.green),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              document,
-              style: GoogleFonts.poppins(fontSize: 13),
-            ),
-          ),
-        ],
-      ),
-    );
+  void _openExternal(String url) async {
+    if (await canLaunchUrl(Uri.parse(url))) {
+      await launchUrl(Uri.parse(url));
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Could not open $url'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   @override
@@ -361,7 +797,7 @@ class _MastersUpdateScreenState extends State<MastersUpdateScreen> {
             ),
             const SizedBox(width: 8),
             Text(
-              'Masters Programs',
+              'Masters Update',
               style: GoogleFonts.poppins(
                 color: Colors.white,
                 fontWeight: FontWeight.w600,
@@ -373,9 +809,7 @@ class _MastersUpdateScreenState extends State<MastersUpdateScreen> {
         elevation: 0,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Header Section
             Container(
@@ -383,29 +817,24 @@ class _MastersUpdateScreenState extends State<MastersUpdateScreen> {
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 color: deepPurple,
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: const BorderRadius.only(
+                  bottomLeft: Radius.circular(20),
+                  bottomRight: Radius.circular(20),
+                ),
               ),
               child: Column(
                 children: [
-                  Image.asset(
-                    'assets/pages_items/masters.png',
-                    width: 64,
-                    height: 64,
-                    color: Colors.white,
-                  ),
-                  const SizedBox(height: 16),
                   Text(
                     'Postgraduate Programs',
                     style: GoogleFonts.poppins(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
-                      fontSize: 20,
+                      fontSize: 24,
                     ),
-                    textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Discover opportunities for advanced education and career growth',
+                    'Discover top Nigerian universities for your master\'s degree',
                     style: GoogleFonts.poppins(
                       color: Colors.white.withOpacity(0.9),
                       fontSize: 14,
@@ -415,228 +844,106 @@ class _MastersUpdateScreenState extends State<MastersUpdateScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 24),
-
+            
             // Quick Stats
-            Row(
-              children: [
-                Expanded(
-                  child: _buildStatCard('Active Programs', '50+', Icons.school),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _buildStatCard('Universities', '25+', Icons.account_balance),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _buildStatCard('Deadlines', 'This Month', Icons.schedule),
-                ),
-              ],
-            ),
-            const SizedBox(height: 24),
-
-            // Featured Universities
-            Text(
-              'Featured Universities',
-              style: GoogleFonts.poppins(
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
-                color: deepPurple,
-              ),
-            ),
-            const SizedBox(height: 16),
-            _buildUniversityCard(
-              name: 'University of Lagos (UNILAG)',
-              location: 'Lagos, Nigeria',
-              description: 'One of Nigeria\'s premier universities offering world-class postgraduate programs in various fields.',
-              programs: ['MBA', 'MSc Computer Science', 'MSc Economics', 'MA English'],
-              applicationDeadline: 'March 15, 2024',
-              website: 'https://unilag.edu.ng',
-              logo: 'assets/pages_items/masters.png',
-              isFeatured: true,
-            ),
-            _buildUniversityCard(
-              name: 'Obafemi Awolowo University (OAU)',
-              location: 'Ile-Ife, Nigeria',
-              description: 'Renowned for its academic excellence and research contributions in various disciplines.',
-              programs: ['MSc Engineering', 'MSc Agriculture', 'MA History', 'MSc Chemistry'],
-              applicationDeadline: 'March 30, 2024',
-              website: 'https://oauife.edu.ng',
-              logo: 'assets/pages_items/masters.png',
-              isFeatured: true,
-            ),
-            _buildUniversityCard(
-              name: 'University of Ibadan (UI)',
-              location: 'Ibadan, Nigeria',
-              description: 'Nigeria\'s first university with a rich history of academic excellence and research.',
-              programs: ['MSc Medicine', 'MSc Law', 'MA Literature', 'MSc Physics'],
-              applicationDeadline: 'April 10, 2024',
-              website: 'https://ui.edu.ng',
-              logo: 'assets/pages_items/masters.png',
-            ),
-            _buildUniversityCard(
-              name: 'Covenant University',
-              location: 'Ota, Nigeria',
-              description: 'Private university known for its innovative programs and modern facilities.',
-              programs: ['MBA', 'MSc Architecture', 'MSc Business', 'MA Communication'],
-              applicationDeadline: 'March 25, 2024',
-              website: 'https://covenantuniversity.edu.ng',
-              logo: 'assets/pages_items/masters.png',
-            ),
-            const SizedBox(height: 24),
-
-            // Application Tips
-            Card(
-              elevation: 2,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Icon(Icons.lightbulb, color: Colors.amber, size: 24),
-                        const SizedBox(width: 8),
-                        Text(
-                          'Application Tips',
-                          style: GoogleFonts.poppins(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                            color: Colors.amber[700],
-                          ),
-                        ),
-                      ],
+            Container(
+              padding: const EdgeInsets.all(20),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: _buildStatCard(
+                      'Universities',
+                      '${nigerianUniversities.length}',
+                      Icons.school,
+                      deepPurple,
                     ),
-                    const SizedBox(height: 16),
-                    _buildTipItem('Start early - applications can take time to complete'),
-                    _buildTipItem('Research programs thoroughly before applying'),
-                    _buildTipItem('Prepare a strong statement of purpose'),
-                    _buildTipItem('Get recommendation letters from professors'),
-                    _buildTipItem('Ensure all documents are properly certified'),
-                    _buildTipItem('Keep track of application deadlines'),
-                  ],
-                ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _buildStatCard(
+                      'Programs',
+                      '40+',
+                      Icons.book,
+                      Colors.green,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _buildStatCard(
+                      'Duration',
+                      '12-18m',
+                      Icons.access_time,
+                      Colors.orange,
+                    ),
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 24),
-
+            
             // Quick Links
-            Text(
-              'Quick Links',
-              style: GoogleFonts.poppins(
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
-                color: deepPurple,
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Quick Links',
+                    style: GoogleFonts.poppins(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                      color: deepPurple,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  
+                  _buildQuickLinkCard(
+                    'Application Guide',
+                    'Step-by-step application process',
+                    Icons.assignment,
+                    _showApplicationGuide,
+                  ),
+                  _buildQuickLinkCard(
+                    'Scholarships',
+                    'Available funding opportunities',
+                    Icons.monetization_on,
+                    () => _openExternal('https://scholarships.gov.ng'),
+                  ),
+                  _buildQuickLinkCard(
+                    'JAMB Portal',
+                    'Official postgraduate portal',
+                    Icons.link,
+                    () => _openExternal('https://jamb.gov.ng'),
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 16),
-            _buildQuickLinkCard(
-              'Scholarship Opportunities',
-              'Find funding for your postgraduate studies',
-              Icons.monetization_on,
-              Colors.green,
-              () => _openExternal('https://scholarships.gov.ng'),
+            
+            const SizedBox(height: 20),
+            
+            // Featured Universities
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Featured Universities',
+                    style: GoogleFonts.poppins(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                      color: deepPurple,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  
+                  ...nigerianUniversities.map((university) => _buildUniversityCard(university)),
+                ],
+              ),
             ),
-            _buildQuickLinkCard(
-              'Research Grants',
-              'Explore research funding opportunities',
-              Icons.science,
-              Colors.blue,
-              () => _openExternal('https://research.gov.ng'),
-            ),
+            
             const SizedBox(height: 32),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildStatCard(String title, String value, IconData icon) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Icon(icon, color: deepPurple, size: 24),
-          const SizedBox(height: 8),
-          Text(
-            value,
-            style: GoogleFonts.poppins(
-              fontWeight: FontWeight.bold,
-              fontSize: 16,
-              color: deepPurple,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            title,
-            style: GoogleFonts.poppins(
-              fontSize: 12,
-              color: Colors.grey[600],
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTipItem(String tip) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Icon(Icons.check_circle, size: 16, color: Colors.green),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              tip,
-              style: GoogleFonts.poppins(fontSize: 14),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildQuickLinkCard(String title, String description, IconData icon, Color color, VoidCallback onTap) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: ListTile(
-        contentPadding: const EdgeInsets.all(16),
-        leading: Container(
-          width: 48,
-          height: 48,
-          decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Icon(icon, color: color, size: 24),
-        ),
-        title: Text(
-          title,
-          style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
-        ),
-        subtitle: Text(
-          description,
-          style: GoogleFonts.poppins(fontSize: 13, color: Colors.grey[600]),
-        ),
-        trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
-        onTap: onTap,
       ),
     );
   }
