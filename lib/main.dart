@@ -1,28 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'screens/skill_screen.dart';
-import 'screens/preloader_screen_1.dart';
-import 'screens/preloader_screen_2.dart';
-import 'screens/preloader_screen_3.dart';
-import 'screens/preloader_screen_4.dart';
-import 'screens/onboarding_screen.dart';
-import 'screens/login_screen.dart';
-import 'screens/register_screen.dart';
-import 'screens/home_screen.dart';
-import 'screens/customer_care_screen.dart';
-import 'screens/messages_screen.dart';
-import 'screens/resume_builder_screen.dart';
-import 'screens/updates_screen.dart';
-import 'screens/user_screen.dart';
-import 'screens/notification_screen.dart';
-import 'screens/career_assistant_screen.dart';
-import 'screens/nyscguidelines_screen.dart';
-import 'screens/jobs_screen.dart';
-import 'screens/masters_update_screen.dart';
-import 'screens/skill_progress_screen.dart';
-import 'services/supabase_service.dart';
+import 'package:newly_graduate_hub/services/supabase_service.dart';
+import 'package:newly_graduate_hub/screens/home_screen.dart';
+import 'package:newly_graduate_hub/screens/login_screen.dart';
+import 'package:newly_graduate_hub/screens/register_screen.dart';
+import 'package:newly_graduate_hub/screens/messages_screen.dart';
+import 'package:newly_graduate_hub/screens/user_screen.dart';
+import 'package:newly_graduate_hub/screens/skills_screen.dart';
+import 'package:newly_graduate_hub/screens/masters_screen.dart';
+import 'package:newly_graduate_hub/screens/jobs_screen.dart';
+import 'package:newly_graduate_hub/screens/career_assistant_screen.dart';
+import 'package:newly_graduate_hub/screens/nyscguidelines_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -47,68 +35,32 @@ class NewlyGraduateHub extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: dotenv.env['APP_NAME'] ?? 'Newly Graduate Hub',
-      debugShowCheckedModeBanner: false,
+      title: dotenv.env['APP_NAME'] ?? 'Graduate Assistant Hub',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.purple,
-          primary: Colors.purple.shade800,
-        ),
-        useMaterial3: true,
-        textTheme: GoogleFonts.poppinsTextTheme(),
-        inputDecorationTheme: InputDecorationTheme(
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: Colors.purple.shade200),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: Colors.purple.shade600, width: 2),
-          ),
-        ),
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
-            elevation: 2,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-          ),
-        ),
+        primarySwatch: Colors.blue,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      initialRoute: '/onboarding',
+      initialRoute: '/login',
       routes: {
-        '/onboarding': (context) => const OnboardingScreen(),
         '/login': (context) => const LoginScreen(),
         '/register': (context) => const RegisterScreen(),
         '/home': (context) => const HomeScreen(),
-        '/customer-care': (context) => const CustomerCareScreen(),
         '/messages': (context) => const MessagesScreen(),
-        '/resume-builder': (context) => const ResumeBuilderScreen(),
-        '/updates': (context) => const UpdatesScreen(),
-        '/skills': (context) => SkillsScreen(),
+        '/user': (context) => const UserScreen(),
+        '/skills': (context) => const SkillsScreen(),
+        '/masters': (context) => const MastersScreen(),
         '/jobs': (context) => const JobsScreen(),
-        '/skill-progress': (context) => const SkillProgressScreen(),
-        '/tasks': (context) => const TasksScreen(),
-        '/masters-update': (context) => const MastersUpdateScreen(),
-        '/me': (context) => const UserScreen(),
-        '/post': (context) => const PostScreen(),
         '/career-assistant': (context) => const CareerAssistantScreen(),
-        '/notifications': (context) => const NotificationsScreen(),
         '/nysc-guidelines': (context) => const NYSCGuidelinesScreen(),
+        '/tasks': (context) => const TasksScreen(),
+        '/post': (context) => const PostScreen(),
       },
     );
   }
 }
 
-// HomeScreen class moved to home_screen.dart
-
-// Placeholder classes for routes that don't have dedicated files yet
 class TasksScreen extends StatelessWidget {
   const TasksScreen({super.key});
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -120,7 +72,6 @@ class TasksScreen extends StatelessWidget {
 
 class PostScreen extends StatelessWidget {
   const PostScreen({super.key});
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

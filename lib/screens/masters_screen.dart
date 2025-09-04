@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 
-class CareerAssistantScreen extends StatelessWidget {
-  const CareerAssistantScreen({super.key});
+class MastersScreen extends StatelessWidget {
+  const MastersScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Career Assistant'),
+        title: const Text('Masters Programs'),
         backgroundColor: Colors.blue,
         foregroundColor: Colors.white,
       ),
       body: const Center(
-        child: Text('Career Assistant - Coming Soon'),
+        child: Text('Masters Programs - Coming Soon'),
       ),
     );
   }

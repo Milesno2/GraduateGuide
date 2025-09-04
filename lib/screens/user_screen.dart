@@ -1,8 +1,7 @@
-import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:newly_graduate_hub/services/supabase_service.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:typed_data';
 
 class UserScreen extends StatefulWidget {
   const UserScreen({super.key});
@@ -12,377 +11,186 @@ class UserScreen extends StatefulWidget {
 }
 
 class _UserScreenState extends State<UserScreen> {
-  final Color deepPurple = const Color(0xFF6C2786);
-  String? _avatarUrl;
-  bool _isUploading = false;
-
-  Future<void> _changeAvatar() async {
-    try {
-      final picker = ImagePicker();
-      final XFile? picked =
-          await picker.pickImage(source: ImageSource.gallery, maxWidth: 512);
-      if (picked == null) return;
-      setState(() => _isUploading = true);
-      final Uint8List data = await picked.readAsBytes();
-
-      final user = SupabaseService().getCurrentUser();
-      final String path = user != null
-          ? 'avatars/${user.id}.png'
-          : 'avatars/guest_${DateTime.now().millisecondsSinceEpoch}.png';
-
-      final String? publicUrl = await SupabaseService()
-          .uploadProfileImage(user.id, File.fromRawPath(data));
-      if (!mounted) return;
-      setState(() {
-        _avatarUrl = publicUrl;
-        _isUploading = false;
-      });
-
-      if (user != null && publicUrl != null) {
-        await SupabaseService().updateUserProfile(user.id, {'profile_image': publicUrl});
-      }
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text('Profile image updated',
-                style: GoogleFonts.poppins(color: Colors.white)),
-            backgroundColor: deepPurple),
-      );
-    } catch (e) {
-      if (!mounted) return;
-      setState(() => _isUploading = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text('Failed to update image',
-                style: GoogleFonts.poppins(color: Colors.white)),
-            backgroundColor: Colors.red),
-      );
-    }
-  }
+  final SupabaseService _supabaseService = SupabaseService();
+  final ImagePicker _picker = ImagePicker();
+  bool _isLoading = false;
 
   @override
   Widget build(BuildContext context) {
-    final userData = {
-      'firstName': 'Dada',
-      'lastName': 'Timilehin Silvanus',
-      'status': 'LAUTECH GRADUATE',
-      'gender': 'Male',
-      'course': 'Animal Sci.',
-      'birthDate': 'March 17',
-      'nin': 'timi001@gmail.com',
-      'mobile': '+234809012345',
-      'nationality': 'NIGERIAN',
-      'school': 'Lautech',
-    };
-
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              Stack(
-                children: [
-                  ClipPath(
-                    clipper: CurvedHeaderClipper(),
-                    child: Container(
-                      height: 220,
-                      color: deepPurple,
-                    ),
-                  ),
-                  Positioned(
-                    top: 16,
-                    left: 8,
-                    child: IconButton(
-                      icon: Image.asset(
-                        'assets/pages_assets/ChevronLeftOutline.png',
-                        width: 28,
-                        height: 28,
-                        color: Colors.white,
-                      ),
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                  ),
-                  Positioned(
-                    top: 16,
-                    right: 24,
-                    child: Row(
-                      children: [
-                        Image.asset('assets/pages_items/support.png',
-                            width: 28, height: 28),
-                        const SizedBox(width: 18),
-                        GestureDetector(
-                          onTap: () =>
-                              Navigator.pushNamed(context, '/notifications'),
-                          child: Image.asset(
-                            'assets/pages_assets/Bell.png',
-                            width: 27,
-                            height: 27,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Positioned(
-                    top: 70,
-                    left: 0,
-                    right: 0,
-                    child: Column(
-                      children: [
-                        Stack(
-                          alignment: Alignment.bottomRight,
-                          children: [
-                            CircleAvatar(
-                              radius: 48,
-                              backgroundColor: Colors.white,
-                              backgroundImage: _avatarUrl != null
-                                  ? NetworkImage(_avatarUrl!)
-                                  : AssetImage('assets/pages_assets/avatar.png')
-                                      as ImageProvider,
-                              child: _avatarUrl == null ? null : null,
-                            ),
-                            InkWell(
-                              onTap: _isUploading ? null : _changeAvatar,
-                              child: Container(
-                                width: 30,
-                                height: 30,
-                                decoration: const BoxDecoration(
-                                    color: Colors.white,
-                                    shape: BoxShape.circle),
-                                child: _isUploading
-                                    ? const Padding(
-                                        padding: EdgeInsets.all(6),
-                                        child: CircularProgressIndicator(
-                                            strokeWidth: 2),
-                                      )
-                                    : Image.asset(
-                                        'assets/pages_assets/Camera.png',
-                                        width: 18,
-                                        height: 18,
-                                        color: Colors.black54,
-                                      ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          userData['firstName'] ?? '',
-                          style: GoogleFonts.poppins(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20,
-                          ),
-                        ),
-                        Text(
-                          userData['lastName'] ?? '',
-                          style: GoogleFonts.poppins(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w500,
-                            fontSize: 16,
-                          ),
-                        ),
-                        Text(
-                          userData['status'] ?? '',
-                          style: GoogleFonts.poppins(
-                            color: Colors.white.withOpacity(0.8),
-                            fontSize: 13,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                child: Column(
-                  children: [
-                    _buildInfoRow('Gender', userData['gender'] ?? ''),
-                    _buildInfoRow('Course of Study', userData['course'] ?? ''),
-                    _buildInfoRow('Birth date', userData['birthDate'] ?? ''),
-                    _buildInfoRow('NIN', userData['nin'] ?? ''),
-                    _buildInfoRow('Mobile No.', userData['mobile'] ?? ''),
-                    _buildInfoRow('Nationality', userData['nationality'] ?? ''),
-                    _buildInfoRow('School Attended', userData['school'] ?? ''),
-                    const SizedBox(height: 24),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: deepPurple,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          elevation: 0,
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                        ),
-                        onPressed: () =>
-                            Navigator.pushNamed(context, '/skill-progress'),
-                        child: Text(
-                          'Skill acquisition Progress',
-                          style: GoogleFonts.poppins(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton.icon(
-                        icon: Icon(Icons.edit, color: Colors.white),
-                        label: Text(
-                          'Edit Profile',
-                          style: GoogleFonts.poppins(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
-                        ),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: deepPurple,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          elevation: 0,
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                        ),
-                        onPressed: () {
-                          showDialog(
-                            context: context,
-                            builder: (ctx) => AlertDialog(
-                              title: Text('Edit Profile',
-                                  style: GoogleFonts.poppins(
-                                      fontWeight: FontWeight.bold)),
-                              content: Text('Profile editing UI goes here.',
-                                  style: GoogleFonts.poppins()),
-                              actions: [
-                                TextButton(
-                                  child: Text('Close',
-                                      style: GoogleFonts.poppins()),
-                                  onPressed: () => Navigator.pop(ctx),
-                                ),
-                              ],
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
+      appBar: AppBar(
+        title: const Text('Profile'),
+        backgroundColor: Colors.blue,
+        foregroundColor: Colors.white,
       ),
-      bottomNavigationBar: _buildBottomNavBar(context, deepPurple),
-    );
-  }
-
-  Widget _buildInfoRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6.0),
-      child: Row(
-        children: [
-          Expanded(
-            flex: 3,
-            child: Text(
-              label,
-              style: GoogleFonts.poppins(
-                color: Colors.grey[700],
-                fontWeight: FontWeight.w500,
-                fontSize: 15,
-              ),
-            ),
-          ),
-          Expanded(
-            flex: 5,
-            child: Text(
-              value,
-              style: GoogleFonts.poppins(
-                color: Colors.grey[800],
-                fontWeight: FontWeight.w400,
-                fontSize: 15,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildBottomNavBar(BuildContext context, Color deepPurple) {
-    return Container(
-      decoration: BoxDecoration(color: Colors.white, boxShadow: [
-        BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, -2))
-      ]),
-      child: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: deepPurple,
-        unselectedItemColor: Colors.grey,
-        currentIndex: 3,
-        items: [
-          BottomNavigationBarItem(
-              icon: Image.asset('assets/pages_assets/Home (1).png',
-                  width: 22, height: 22),
-              label: 'Home'),
-          BottomNavigationBarItem(
-              icon: Image.asset('assets/pages_assets/Annotation.png',
-                  width: 22, height: 22),
-              label: 'Messages'),
-          BottomNavigationBarItem(
-              icon: Image.asset('assets/pages_assets/Speakerphone.png',
-                  width: 22, height: 22),
-              label: 'Updates'),
-          BottomNavigationBarItem(
-              icon: Image.asset('assets/pages_assets/UserCircle.png',
-                  width: 22, height: 22),
-              label: 'Me'),
-        ],
-        onTap: (index) {
-          switch (index) {
-            case 0:
-              Navigator.pushReplacementNamed(context, '/home');
-              break;
-            case 1:
-              Navigator.pushReplacementNamed(context, '/messages');
-              break;
-            case 2:
-              Navigator.pushReplacementNamed(context, '/notifications');
-              break;
-            case 3:
-              break;
+      body: FutureBuilder(
+        future: _supabaseService.getCurrentUser(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
           }
+
+          final user = snapshot.data;
+          if (user == null) {
+            return const Center(child: Text('User not found'));
+          }
+
+          return SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: [
+                _buildProfileSection(user),
+                const SizedBox(height: 24),
+                _buildSettingsSection(),
+              ],
+            ),
+          );
         },
       ),
     );
   }
-}
 
-class CurvedHeaderClipper extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    Path path = Path();
-    path.lineTo(0, size.height - 60);
-    path.quadraticBezierTo(
-      size.width / 2,
-      size.height,
-      size.width,
-      size.height - 60,
+  Widget _buildProfileSection(user) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            Stack(
+              children: [
+                CircleAvatar(
+                  radius: 50,
+                  backgroundImage: user.userMetadata?['profile_image'] != null
+                      ? NetworkImage(user.userMetadata!['profile_image'])
+                      : null,
+                  child: user.userMetadata?['profile_image'] == null
+                      ? Text(
+                          user.email?[0].toUpperCase() ?? 'U',
+                          style: const TextStyle(fontSize: 32),
+                        )
+                      : null,
+                ),
+                Positioned(
+                  bottom: 0,
+                  right: 0,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.blue,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: IconButton(
+                      onPressed: _pickImage,
+                      icon: const Icon(Icons.camera_alt, color: Colors.white),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Text(
+              user.userMetadata?['name'] ?? user.email ?? 'User',
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              user.email ?? '',
+              style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+            ),
+          ],
+        ),
+      ),
     );
-    path.lineTo(size.width, 0);
-    path.close();
-    return path;
   }
 
-  @override
-  bool shouldReclip(CustomClipper<Path> oldClipper) => false;
+  Widget _buildSettingsSection() {
+    return Card(
+      child: Column(
+        children: [
+          ListTile(
+            leading: const Icon(Icons.edit),
+            title: const Text('Edit Profile'),
+            onTap: () {
+              // Navigate to edit profile screen
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.notifications),
+            title: const Text('Notifications'),
+            onTap: () {
+              // Navigate to notifications screen
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.security),
+            title: const Text('Privacy & Security'),
+            onTap: () {
+              // Navigate to privacy screen
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.help),
+            title: const Text('Help & Support'),
+            onTap: () {
+              // Navigate to help screen
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.logout, color: Colors.red),
+            title: const Text('Sign Out', style: TextStyle(color: Colors.red)),
+            onTap: _signOut,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _pickImage() async {
+    try {
+      setState(() {
+        _isLoading = true;
+      });
+
+      final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+      if (image == null) return;
+
+      final user = await _supabaseService.getCurrentUser();
+      if (user == null) return;
+
+      final bytes = await image.readAsBytes();
+      
+      final String? publicUrl = await SupabaseService()
+          .uploadProfileImage(user.id, bytes);
+      
+      if (!mounted) return;
+
+      if (publicUrl != null) {
+        await SupabaseService().updateUserProfile(user.id, {'profile_image': publicUrl});
+        setState(() {});
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Profile image updated successfully!')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error updating profile image: $e')),
+      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _signOut() async {
+    try {
+      await _supabaseService.signOut();
+      if (!mounted) return;
+      
+      Navigator.of(context).pushReplacementNamed('/login');
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error signing out: $e')),
+      );
+    }
+  }
 }

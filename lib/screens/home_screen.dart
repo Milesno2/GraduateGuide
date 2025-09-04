@@ -10,6 +10,10 @@ import 'package:newly_graduate_hub/screens/updates_screen.dart';
 import 'package:newly_graduate_hub/screens/user_screen.dart';
 import 'package:newly_graduate_hub/screens/messages_screen.dart';
 import 'package:newly_graduate_hub/screens/career_assistant_screen.dart';
+import 'package:newly_graduate_hub/screens/skills_screen.dart';
+import 'package:newly_graduate_hub/screens/masters_screen.dart';
+import 'package:newly_graduate_hub/screens/jobs_screen.dart';
+import 'package:newly_graduate_hub/screens/nyscguidelines_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
