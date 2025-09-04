@@ -19,6 +19,7 @@ import 'package:newly_graduate_hub/screens/skills_landing_screen.dart';
 import 'package:newly_graduate_hub/screens/skill1.dart';
 import 'package:newly_graduate_hub/screens/skill2.dart';
 import 'package:newly_graduate_hub/screens/skill3.dart';
+import 'package:newly_graduate_hub/screens/resume_builder_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -147,6 +148,7 @@ class _NewlyGraduateHubState extends State<NewlyGraduateHub> {
             '/onboarding': (context) => const OnboardingScreen(),
             '/preload-1': (context) => const PreloaderScreen1(),
             '/updates': (context) => const UpdatesScreen(),
+            '/resume-builder': (context) => const ResumeBuilderScreen(),
           },
         );
       },
