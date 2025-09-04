@@ -27,11 +27,16 @@ import 'services/supabase_service.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  // Load environment variables
-  await dotenv.load(fileName: ".env");
-  
-  // Initialize Supabase
-  await SupabaseService().initialize();
+  try {
+    // Load environment variables
+    await dotenv.load(fileName: ".env");
+    
+    // Initialize Supabase
+    await SupabaseService().initialize();
+  } catch (e) {
+    print('Initialization error: $e');
+    // Continue with default values
+  }
   
   runApp(const NewlyGraduateHub());
 }
