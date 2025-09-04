@@ -11,38 +11,30 @@ import 'package:newly_graduate_hub/screens/masters_screen.dart';
 import 'package:newly_graduate_hub/screens/jobs_screen.dart';
 import 'package:newly_graduate_hub/screens/career_assistant_screen.dart';
 import 'package:newly_graduate_hub/screens/nyscguidelines_screen.dart';
+import 'package:newly_graduate_hub/screens/onboarding_screen.dart';
+import 'package:newly_graduate_hub/screens/preloader_screen_1.dart';
+import 'package:newly_graduate_hub/utils/log_console.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
-  FlutterError.onError = (FlutterErrorDetails details) {
-    debugPrint('[FlutterError] ${details.exceptionAsString()}');
-    FlutterError.presentError(details);
+  final log = LogConsoleService();
+  debugPrint = (String? message, {int? wrapWidth}) {
+    if (message != null) log.add(message);
+    // Also forward to default stdout
+    // ignore: avoid_print
+    print(message);
   };
 
-  ErrorWidget.builder = (FlutterErrorDetails details) {
-    return Material(
-      color: Colors.white,
-      child: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 600),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Text(
-              'An error occurred. Please refresh or try again later.\n\n${details.exceptionAsString()}',
-              style: const TextStyle(color: Colors.red, fontSize: 14),
-              textAlign: TextAlign.center,
-            ),
-          ),
-        ),
-      ),
-    );
+  FlutterError.onError = (FlutterErrorDetails details) {
+    log.add('[FlutterError] ${details.exceptionAsString()}');
+    FlutterError.presentError(details);
   };
 
   runZonedGuarded(() {
     runApp(const NewlyGraduateHub());
   }, (error, stack) {
-    debugPrint('[ZoneError] $error');
+    log.add('[ZoneError] $error');
   });
 }
 
@@ -59,9 +51,12 @@ class _NewlyGraduateHubState extends State<NewlyGraduateHub> {
 
   Future<void> _initialize() async {
     try {
+      LogConsoleService().add('Initializing Supabase...');
       await SupabaseService().initialize();
+      LogConsoleService().add('Supabase initialized');
     } catch (e) {
       _initError = e;
+      LogConsoleService().add('Init error: $e');
       rethrow;
     }
   }
@@ -78,50 +73,42 @@ class _NewlyGraduateHubState extends State<NewlyGraduateHub> {
     return FutureBuilder<void>(
       future: _initFuture,
       builder: (context, snapshot) {
+        Widget child;
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return MaterialApp(
-            debugShowCheckedModeBanner: false,
-            home: const _SplashScreen(title: 'Loading...'),
-          );
-        }
-
-        if (snapshot.hasError) {
+          child = const _SplashScreen(title: 'Loading...');
+        } else if (snapshot.hasError) {
           final message = (_initError ?? snapshot.error).toString();
-          return MaterialApp(
-            debugShowCheckedModeBanner: false,
-            home: Scaffold(
-              appBar: AppBar(title: const Text('Initialization Error')),
-              body: Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 700),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Text(
-                          'The app failed to start. Please check configuration.',
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 12),
-                        Text(
-                          message,
-                          style: const TextStyle(color: Colors.red),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 16),
-                        ElevatedButton(
-                          onPressed: _retryInit,
-                          child: const Text('Retry'),
-                        )
-                      ],
-                    ),
+          child = Scaffold(
+            appBar: AppBar(title: const Text('Initialization Error')),
+            body: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 700),
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Text(
+                        'The app failed to start. Please check configuration.',
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        message,
+                        style: const TextStyle(color: Colors.red),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 16),
+                      ElevatedButton(onPressed: _retryInit, child: const Text('Retry')),
+                    ],
                   ),
                 ),
               ),
             ),
           );
+        } else {
+          child = const RootRouter();
         }
 
         return MaterialApp(
@@ -131,7 +118,13 @@ class _NewlyGraduateHubState extends State<NewlyGraduateHub> {
             primarySwatch: Colors.blue,
             visualDensity: VisualDensity.adaptivePlatformDensity,
           ),
-          home: const RootRouter(),
+          home: Stack(
+            children: [
+              child,
+              const Positioned.fill(child: IgnorePointer(ignoring: true, child: SizedBox.shrink())),
+              const LogConsoleOverlay(),
+            ],
+          ),
           routes: {
             '/login': (context) => const LoginScreen(),
             '/register': (context) => const RegisterScreen(),
@@ -143,8 +136,8 @@ class _NewlyGraduateHubState extends State<NewlyGraduateHub> {
             '/jobs': (context) => const JobsScreen(),
             '/career-assistant': (context) => const CareerAssistantScreen(),
             '/nysc-guidelines': (context) => const NYSCGuidelinesScreen(),
-            '/tasks': (context) => const TasksScreen(),
-            '/post': (context) => const PostScreen(),
+            '/onboarding': (context) => const OnboardingScreen(),
+            '/preload-1': (context) => const PreloaderScreen1(),
           },
         );
       },
@@ -164,11 +157,9 @@ class _RootRouterState extends State<RootRouter> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      // Determine destination: if logged-in -> Home; else -> Login
-      final user = SupabaseService().client.auth.currentUser;
-      final destination = user == null ? '/login' : '/home';
+      LogConsoleService().add('Routing to onboarding...');
       if (!mounted) return;
-      Navigator.of(context).pushReplacementNamed(destination);
+      Navigator.of(context).pushReplacementNamed('/onboarding');
     });
   }
 
@@ -189,11 +180,7 @@ class _SplashScreen extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const SizedBox(
-              width: 42,
-              height: 42,
-              child: CircularProgressIndicator(),
-            ),
+            const SizedBox(width: 42, height: 42, child: CircularProgressIndicator()),
             const SizedBox(height: 12),
             Text(title),
           ],
