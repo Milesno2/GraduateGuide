@@ -70,27 +70,6 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildArrowItem() {
-    return Center(
-      child: Container(
-        width: 80,
-        height: 80,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.12),
-              blurRadius: 8,
-              spreadRadius: 1,
-            ),
-          ],
-        ),
-        child: const Icon(Icons.arrow_forward_ios, size: 32, color: Colors.grey),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -177,7 +156,10 @@ class HomeScreen extends StatelessWidget {
                     onTap: () => Navigator.pushNamed(context, '/jobs'),
                     child: _buildGridItem('assets/pages_items/job.png', 'Job Offer'),
                   ),
-                  _buildArrowItem(),
+                  GestureDetector(
+                    onTap: () => Navigator.pushNamed(context, '/career-assistant'),
+                    child: _buildGridItem('assets/pages_assets/customer_care.png', 'Career Guide'),
+                  ),
                 ],
               ),
             ),
