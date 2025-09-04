@@ -1,5 +1,5 @@
 [build]
-  command = "git clone https://github.com/flutter/flutter.git -b 3.35.2 flutter-sdk && export PATH=\"$PWD/flutter-sdk/bin:$PATH\" && echo 'SUPABASE_URL=${SUPABASE_URL:-https://zqcykjxwsnlxmtzcmiga.supabase.co}' > .env && echo 'SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY:-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpxY3lranh3c25seG10emNtaWdhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY4NDI4MDgsImV4cCI6MjA3MjQxODgwOH0.dkH258TCMv4q7XXLknfnLNCJu1LVqEGdzabsh-0Oj7s}' >> .env && echo 'APP_NAME=${APP_NAME:-Graduate Assistant Hub}' >> .env && echo 'APP_VERSION=${APP_VERSION:-1.0.0}' >> .env && flutter config --enable-web && flutter clean && flutter pub get && flutter build web --release"
+  command = "chmod +x setup_env.sh && ./setup_env.sh && flutter config --enable-web && flutter clean && flutter pub get && flutter build web --release"
   publish = "build/web"
 
 [build.environment]
