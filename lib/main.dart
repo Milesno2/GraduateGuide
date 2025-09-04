@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:newly_graduate_hub/services/supabase_service.dart';
 import 'package:newly_graduate_hub/screens/home_screen.dart';
@@ -11,68 +12,108 @@ import 'package:newly_graduate_hub/screens/jobs_screen.dart';
 import 'package:newly_graduate_hub/screens/career_assistant_screen.dart';
 import 'package:newly_graduate_hub/screens/nyscguidelines_screen.dart';
 
-void main() async {
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Global error reporting to avoid blank screens
   FlutterError.onError = (FlutterErrorDetails details) {
-    debugPrint('FlutterError: \n${details.exceptionAsString()}');
+    debugPrint('FlutterError: ${details.exceptionAsString()}');
     FlutterError.presentError(details);
   };
 
-  ErrorWidget.builder = (FlutterErrorDetails details) {
-    return MaterialApp(
-      home: Scaffold(
-        backgroundColor: Colors.white,
-        body: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Text(
-              'A runtime error occurred. Please check the console logs.\n\n${details.exceptionAsString()}',
-              style: const TextStyle(color: Colors.red),
-              textAlign: TextAlign.center,
-            ),
-          ),
-        ),
-      ),
-    );
-  };
-
-  try {
-    // Initialize Supabase
-    await SupabaseService().initialize();
-  } catch (e) {
-    debugPrint('Initialization error: $e');
-  }
-
-  runApp(const NewlyGraduateHub());
+  runZonedGuarded(() {
+    runApp(const NewlyGraduateHub());
+  }, (error, stack) {
+    debugPrint('Zone error: $error');
+  });
 }
 
-class NewlyGraduateHub extends StatelessWidget {
+class NewlyGraduateHub extends StatefulWidget {
   const NewlyGraduateHub({super.key});
 
   @override
+  State<NewlyGraduateHub> createState() => _NewlyGraduateHubState();
+}
+
+class _NewlyGraduateHubState extends State<NewlyGraduateHub> {
+  late final Future<void> _initFuture;
+  Object? _initError;
+
+  @override
+  void initState() {
+    super.initState();
+    _initFuture = _initialize();
+  }
+
+  Future<void> _initialize() async {
+    try {
+      await SupabaseService().initialize();
+    } catch (e) {
+      _initError = e;
+      rethrow;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: const String.fromEnvironment('APP_NAME', defaultValue: 'Graduate Assistant Hub'),
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
-      initialRoute: '/login',
-      routes: {
-        '/login': (context) => const LoginScreen(),
-        '/register': (context) => const RegisterScreen(),
-        '/home': (context) => const HomeScreen(),
-        '/messages': (context) => const MessagesScreen(),
-        '/user': (context) => const UserScreen(),
-        '/skills': (context) => const SkillsScreen(),
-        '/masters': (context) => const MastersScreen(),
-        '/jobs': (context) => const JobsScreen(),
-        '/career-assistant': (context) => const CareerAssistantScreen(),
-        '/nysc-guidelines': (context) => const NYSCGuidelinesScreen(),
-        '/tasks': (context) => const TasksScreen(),
-        '/post': (context) => const PostScreen(),
+    return FutureBuilder<void>(
+      future: _initFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return MaterialApp(
+            home: Scaffold(
+              body: Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: const [
+                    CircularProgressIndicator(),
+                    SizedBox(height: 12),
+                    Text('Loading...'),
+                  ],
+                ),
+              ),
+            ),
+          );
+        }
+        if (snapshot.hasError) {
+          return MaterialApp(
+            home: Scaffold(
+              backgroundColor: Colors.white,
+              body: Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Text(
+                    'Initialization error. Please retry later.\n\n${_initError ?? snapshot.error}',
+                    style: const TextStyle(color: Colors.red),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
+            ),
+          );
+        }
+
+        return MaterialApp(
+          title: const String.fromEnvironment('APP_NAME', defaultValue: 'Graduate Assistant Hub'),
+          theme: ThemeData(
+            primarySwatch: Colors.blue,
+            visualDensity: VisualDensity.adaptivePlatformDensity,
+          ),
+          initialRoute: '/login',
+          routes: {
+            '/login': (context) => const LoginScreen(),
+            '/register': (context) => const RegisterScreen(),
+            '/home': (context) => const HomeScreen(),
+            '/messages': (context) => const MessagesScreen(),
+            '/user': (context) => const UserScreen(),
+            '/skills': (context) => const SkillsScreen(),
+            '/masters': (context) => const MastersScreen(),
+            '/jobs': (context) => const JobsScreen(),
+            '/career-assistant': (context) => const CareerAssistantScreen(),
+            '/nysc-guidelines': (context) => const NYSCGuidelinesScreen(),
+            '/tasks': (context) => const TasksScreen(),
+            '/post': (context) => const PostScreen(),
+          },
+        );
       },
     );
   }
